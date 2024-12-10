@@ -29,7 +29,7 @@
         <td>{{ clasificacion.estatus ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editClasificacion(clasificacion)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableClasificacion(clasificacion)" severity="danger"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableClasificacion(clasificacion)" severity="danger" *ngIf="clasificacion.estatus" ></p-button>
           <p-button icon="pi pi-check" (onClick)="activeClasificacion(clasificacion)" severity="success" *ngIf="!clasificacion.estatus"></p-button>
         </td>
       </tr>

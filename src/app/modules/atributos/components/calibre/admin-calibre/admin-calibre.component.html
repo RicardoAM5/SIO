@@ -29,7 +29,7 @@
         <td>{{ calibre.estado ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editCalibre(calibre)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableCalibre(calibre)" severity="danger"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableCalibre(calibre)" severity="danger" *ngIf="calibre.estado"></p-button>
           <p-button icon="pi pi-check" (onClick)="activeCalibre(calibre)" severity="success" *ngIf="!calibre.estado"></p-button>
         </td>
       </tr>

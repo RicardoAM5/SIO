@@ -31,7 +31,7 @@
         <td>{{ molino.estatus ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editMolino(molino)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableMolino(molino)" severity="danger"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableMolino(molino)" severity="danger" *ngIf="molino.estatus" ></p-button>
           <p-button icon="pi pi-check" (onClick)="activeMolino(molino)" severity="success" *ngIf="!molino.estatus"></p-button>
         </td>
       </tr>

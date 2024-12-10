@@ -29,7 +29,7 @@
         <td>{{ gramaje.estado ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editGramaje(gramaje)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableGramaje(gramaje)" severity="danger"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableGramaje(gramaje)" severity="danger"  *ngIf="gramaje.estado"></p-button>
           <p-button icon="pi pi-check" (onClick)="activeGramaje(gramaje)" severity="success" *ngIf="!gramaje.estado"></p-button>
         </td>
       </tr>

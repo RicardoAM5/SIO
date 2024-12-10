@@ -29,7 +29,7 @@
         <td>{{ division.estatus ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editDivision(division)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableDivision(division)" severity="danger"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableDivision(division)" severity="danger"  *ngIf="division.estatus"></p-button>
           <p-button icon="pi pi-check" (onClick)="activeDivision(division)" severity="success" *ngIf="!division.estatus"></p-button>
         </td>
       </tr>

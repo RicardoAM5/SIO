@@ -29,7 +29,7 @@
         <td>{{ grado.estado ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editGrado(grado)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableGrado(grado)" severity="danger"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableGrado(grado)" severity="danger" *ngIf="grado.estado"></p-button>
           <p-button icon="pi pi-check" (onClick)="activeGrado(grado)" severity="success" *ngIf="!grado.estado"></p-button>
         </td>
       </tr>
