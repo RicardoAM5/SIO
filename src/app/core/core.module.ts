@@ -6,8 +6,6 @@ import { AnchoService } from './services/ancho.service';
 @NgModule({
   imports: [
     HttpClientModule,
- 
-    
   ],
   providers: [
     AnchoService,

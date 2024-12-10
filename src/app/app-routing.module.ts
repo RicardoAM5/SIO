@@ -1,7 +1,7 @@
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { AppLayoutComponent } from './layout/app.layout.component';
-import { NotfoundComponent } from './components/notfound/notfound.component';
+import { NotfoundComponent } from './modules/notfound/notfound.component';
 @NgModule({
     imports: [
         RouterModule.forRoot(
@@ -12,10 +12,7 @@ import { NotfoundComponent } from './components/notfound/notfound.component';
                     children: [
                         {
                             path: 'ancho',
-                            loadChildren: () =>
-                                import('./modules/ancho/ancho.module').then(
-                                    (m) => m.AnchoModule
-                                ),
+                            loadChildren: () => import('./modules/ancho/ancho.module').then((m) => m.AnchoModule),
                         },
                     ],
                 },

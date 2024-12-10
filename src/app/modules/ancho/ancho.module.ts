@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { CoreModule } from 'src/app/core/core.module';
 import { AnchoRoutingModule } from './ancho-routing.module';
 import {  MessageService } from 'primeng/api';
-import { PrimeNgModule } from 'src/app/components/shared/prime-ng.module';
+import { PrimeNgModule } from 'src/app/modules/shared/prime-ng.module';
 
 
 @NgModule({

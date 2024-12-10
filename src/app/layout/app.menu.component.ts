@@ -18,12 +18,12 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     {
                         label: 'Productos Maestros',
-                        icon: 'pi pi-users',
+                        icon: 'pi pi-table',
                         routerLink: ['/ancho'],
                     },
                     {
                         label: 'Productos',
-                        icon: 'pi pi-truck',
+                        icon: 'pi pi-th-large',
                         routerLink: ['/calibre'],
                     },
                 ],
@@ -33,17 +33,17 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     {
                         label: 'RM',
-                        icon: 'pi pi-box',
+                        icon: 'pi pi-chart-line',
                         routerLink: ['/ancho'],
                     },
                     {
                         label: 'Grupos',
-                        icon: 'pi pi-tags',
+                        icon: 'pi pi-sitemap',
                         routerLink: ['/ancho'],
                     },
                     {
                         label: 'Generacion OC',
-                        icon: 'pi pi-tags',
+                        icon: 'pi pi-cart-plus',
                         routerLink: ['/ancho'],
                     },
                     
@@ -54,7 +54,7 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     {
                         label: 'Firmado y Sellado',
-                        icon: 'pi pi-box',
+                        icon: 'pi pi-file',
                         routerLink: ['/ancho'],
                     },
 
@@ -66,42 +66,43 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     {
                         label: 'Tipos',
-                        icon: 'pi pi-shopping-cart',
                         routerLink: ['/ancho'],
                     },
+                
                     {
                         label: 'Clases',
-                        icon: 'pi pi-chart-line',
                         routerLink: ['/ancho'],
                     },
                     {
                         label: 'Calibres',
-                        icon: 'pi pi-dollar',
                         routerLink: ['/ancho'],
                     },
                     {
                         label: 'Gramajes',
-                        icon: 'pi pi-briefcase',
                         routerLink: ['/ancho'],
                     },
                     {
                         label: 'Molinos',
-                        icon: 'pi pi-briefcase',
                         routerLink: ['/ancho'],
                     },   
                     {
                         label: 'Grado',
-                        icon: 'pi pi-briefcase',
                         routerLink: ['/ancho'],
                     },   
                     {
+                        label: 'Anchos',
+                        routerLink: ['/ancho'],
+                    },   
+                    {
+                        label: 'Clasificaciones',
+                        routerLink: ['/ancho'],
+                    },
+                    {
                         label: 'Categorias',
-                        icon: 'pi pi-briefcase',
                         routerLink: ['/ancho'],
                     },   
                     {
                         label: 'Divisiones',
-                        icon: 'pi pi-briefcase',
                         routerLink: ['/ancho'],
                     },  
                 ],
