@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { AnchoService } from 'src/app/core/services/ancho.service';
 import { IAncho } from 'src/app/core/models/IAncho.interface';
-import { FormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-ancho',
   templateUrl: './admin-ancho.component.html',
-  styleUrls: ['./admin-ancho.component.css']
+  styleUrls: ['./admin-ancho.component.css'],
+  providers: [MessageService],
 })
 export class AdminAnchoComponent implements OnInit {
   public anchos: IAncho[] = [];
@@ -26,6 +27,8 @@ export class AdminAnchoComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.messageService.add({severity:'success', summary: 'Success', detail: 'Message Content'});
+
     this.getAllAnchos();
   }
 
@@ -96,6 +99,7 @@ export class AdminAnchoComponent implements OnInit {
               summary: 'Éxito',
               detail: 'Ancho actualizado',
             });
+            console.log("Ancho actualizado", data);
           },
           error: (err) => {
             this.messageService.add({

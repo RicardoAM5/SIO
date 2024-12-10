@@ -6,7 +6,7 @@ import { IAncho } from '../models/IAncho.interface';
 @Injectable({
     providedIn: 'root',
 })
-export class AnchoService { private readonly endpoint = '/ancho'; // Endpoint base para la entidad "Ancho"
+export class AnchoService { private readonly endpoint = 'ancho'; // Endpoint base para la entidad "Ancho"
 
     constructor(private api: ApiService) {}
   

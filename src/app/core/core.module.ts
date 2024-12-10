@@ -1,7 +1,7 @@
-import { NgModule} from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import { HttpClientModule, HttpRequest, HttpResponse } from '@angular/common/http';
 import { AnchoService } from './services/ancho.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { PrimeNgModule } from '../components/shared/prime-ng.module';
 
 
@@ -11,11 +11,11 @@ import { PrimeNgModule } from '../components/shared/prime-ng.module';
     
   ],
   providers: [
-    //aqui se agregan los servicios
     AnchoService,
-    MessageService
-
+    MessageService,
+    ConfirmationService
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CoreModule {
 

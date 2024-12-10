@@ -12,6 +12,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   
@@ -27,11 +30,18 @@ import { CheckboxModule } from 'primeng/checkbox';
     DialogModule,
     CommonModule,
     FormsModule,
-    ToolbarModule,
+    CheckboxModule,
     TableModule,
     DialogModule,
+    InputTextModule,
     CalendarModule,
-    CheckboxModule,
+    ToastModule,
+    ConfirmDialogModule,
+    CommonModule,
+    FormsModule
+  ],
+  providers: [
+    MessageService
   ],
 })
 export class PrimeNgModule {}
