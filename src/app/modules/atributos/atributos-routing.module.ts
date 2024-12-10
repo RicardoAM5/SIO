@@ -10,7 +10,7 @@ import { AdminDivisionComponent } from './components/division/admin-division/adm
 import { AdminGradoComponent } from './components/grado/admin-grado/admin-grado.component';
 import { AdminGramajeComponent } from './components/gramaje/admin-gramaje/admin-gramaje.component';
 import { AdminMolinoComponent } from './components/molino/admin-molino/admin-molino.component';
-import { AdminTiposComponent } from './components/tipo/admin-tipos/admin-tipos.component';
+import { AdminTipoComponent } from './components/tipo/admin-tipos/admin-tipos.component';
 
 const routes: Routes = [
   { path: '', component: AdminAnchoComponent }, 
@@ -23,7 +23,7 @@ const routes: Routes = [
   {path: 'grado', component:AdminGradoComponent},
   {path: 'gramaje', component:AdminGramajeComponent},
   {path: 'molino', component:AdminMolinoComponent},
-  {path: 'tipo', component:AdminTiposComponent},
+  {path: 'tipo', component:AdminTipoComponent},
 
 ];
 

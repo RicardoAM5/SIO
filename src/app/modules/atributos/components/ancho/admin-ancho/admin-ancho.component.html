@@ -29,8 +29,8 @@
         <td>{{ ancho.estatus ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editAncho(ancho)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="deleteAncho(ancho)"  severity="danger"></p-button>
-          <p-button icon="pi pi-undo" (onClick)="activeAncho(ancho)" severity ="success" ></p-button>
+          <p-button icon="pi pi-trash" (onClick)="deleteAncho(ancho)"  severity="danger" *ngIf="ancho.estatus" ></p-button>
+          <p-button icon="pi pi-undo" (onClick)="activeAncho(ancho)" severity ="success" *ngIf="!ancho.estatus" ></p-button>
 
 
         </td>
@@ -42,11 +42,11 @@
     <div class="p-fluid">
       <div class="field">
         <label for="ancho">Ancho</label>
-        <input id="ancho" type="number" pInputText [(ngModel)]="ancho.ancho" required />
+        <input id="ancho" type="number" pInputText [(ngModel)]="ancho.ancho"  required />
       </div>
       <div class="field">
         <label for="sufijo">Sufijo</label>
-        <input id="sufijo" type="text" pInputText [(ngModel)]="ancho.sufijo" required/>
+        <input id="sufijo" type="text" pInputText [(ngModel)]="ancho.sufijo"  required/>
       </div>
     </div>
 

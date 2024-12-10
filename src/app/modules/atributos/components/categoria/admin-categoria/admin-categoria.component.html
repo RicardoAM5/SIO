@@ -1,3 +1,56 @@
-<p>
-  admin-categoria works!
-</p>
+<div>
+  <h1>Categorías</h1>
+</div>
+<hr>
+
+<div class="card">
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
+      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedCategorias.length" (onClick)="deleteCategoria(selectedCategorias[0])"></p-button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table [value]="categorias" [(selection)]="selectedCategorias" [rows]="10" [paginator]="true" dataKey="idCategoria">
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSelectableColumn></th>
+        <th pSortableColumn="categoria">Categoría</th>
+        <th pSortableColumn="descripcion">Descripción</th>
+        <th pSortableColumn="estatus">Estatus</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-categoria>
+      <tr>
+        <td><p-tableCheckbox [value]="categoria"></p-tableCheckbox></td>
+        <td>{{ categoria.categoria }}</td>
+        <td>{{ categoria.descripcion }}</td>
+        <td>{{ categoria.estatus ? 'Activo' : 'Inactivo' }}</td>
+        <td>
+          <p-button icon="pi pi-pencil" (onClick)="editCategoria(categoria)"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableCategoria(categoria)" severity="danger"></p-button>
+          <p-button icon="pi pi-check" (onClick)="activeCategoria(categoria)" severity="success" *ngIf="!categoria.estatus"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="categoriaDialog" header="Detalles de la Categoría" [modal]="true">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="categoria">Categoría</label>
+        <input id="categoria" type="text" pInputText [(ngModel)]="categoria.categoria" required />
+      </div>
+      <div class="field">
+        <label for="descripcion">Descripción</label>
+        <input id="descripcion" type="text" pInputText [(ngModel)]="categoria.descripcion" required />
+      </div>
+    </div>
+
+    <p-footer>
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveCategoria()"></button>
+    </p-footer>
+  </p-dialog>
+</div>

@@ -1,3 +1,56 @@
-<p>
-  admin-division works!
-</p>
+<div>
+  <h1>Divisiones</h1>
+</div>
+<hr>
+
+<div class="card">
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
+      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedDivisiones.length" (onClick)="deleteDivision(selectedDivisiones[0])"></p-button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table [value]="divisiones" [(selection)]="selectedDivisiones" [rows]="10" [paginator]="true" dataKey="idDivision">
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSelectableColumn></th>
+        <th pSortableColumn="division">División</th>
+        <th pSortableColumn="descripcion">Descripción</th>
+        <th pSortableColumn="estatus">Estatus</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-division>
+      <tr>
+        <td><p-tableCheckbox [value]="division"></p-tableCheckbox></td>
+        <td>{{ division.division }}</td>
+        <td>{{ division.descripcion }}</td>
+        <td>{{ division.estatus ? 'Activo' : 'Inactivo' }}</td>
+        <td>
+          <p-button icon="pi pi-pencil" (onClick)="editDivision(division)"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="disableDivision(division)" severity="danger"></p-button>
+          <p-button icon="pi pi-check" (onClick)="activeDivision(division)" severity="success" *ngIf="!division.estatus"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="divisionDialog" header="Detalles de la División" [modal]="true">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="division">División</label>
+        <input id="division" type="text" pInputText [(ngModel)]="division.division" required />
+      </div>
+      <div class="field">
+        <label for="descripcion">Descripción</label>
+        <input id="descripcion" type="text" pInputText [(ngModel)]="division.descripcion" required />
+      </div>
+    </div>
+
+    <p-footer>
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveDivision()"></button>
+    </p-footer>
+  </p-dialog>
+</div>

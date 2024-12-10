@@ -27,21 +27,12 @@ export class AdminAnchoComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Prueba',
-      detail: 'Este es un mensaje de prueba',
-
-    });
     this.getAllAnchos();
-
   }
-  
-
 
   // Obtener todos los anchos
   getAllAnchos() {
-    this.anchoService.getAllAncho().subscribe({
+    this.anchoService.getAll().subscribe({
       next: (data) => {
         this.anchos = data;
       },
@@ -75,7 +66,7 @@ export class AdminAnchoComponent implements OnInit {
     if (this.ancho.ancho > 0 && this.ancho.sufijo.trim()) {
       if (this.ancho.idAncho === 0) {
         // Crear nuevo ancho
-        this.anchoService.saveAncho(this.ancho).subscribe({
+        this.anchoService.save(this.ancho).subscribe({
           next: (data) => {
             this.anchos.push(data);
             this.messageService.add({
@@ -95,7 +86,7 @@ export class AdminAnchoComponent implements OnInit {
         });
       } else {
         // Editar ancho existente
-        this.anchoService.updateAncho(this.ancho.idAncho, this.ancho).subscribe({
+        this.anchoService.update(this.ancho.idAncho, this.ancho).subscribe({
           next: (data) => {
             const index = this.anchos.findIndex((a) => a.idAncho === data.idAncho);
             if (index !== -1) {
@@ -106,7 +97,6 @@ export class AdminAnchoComponent implements OnInit {
               summary: 'Éxito',
               detail: 'Ancho actualizado',
             });
-            console.log("Ancho actualizado", data);
           },
           error: (err) => {
             this.messageService.add({
@@ -136,13 +126,11 @@ export class AdminAnchoComponent implements OnInit {
     this.anchoDialog = true;
   }
 
-
-  
-  // Eliminar un ancho
+  // Activar un ancho
   activeAncho(ancho: IAncho) {
-    this.anchoService.activeAncho(ancho.idAncho).subscribe({
+    this.anchoService.active(ancho.idAncho).subscribe({
       next: () => {
-        this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
+        ancho.estatus = true;
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
@@ -159,47 +147,32 @@ export class AdminAnchoComponent implements OnInit {
       },
     });
   }
-  
 
-
-  // Eliminar anchos seleccionados
-  deleteSelectedAnchos() {
-    if (this.selectedAnchos.length > 0) {
-      this.selectedAnchos.forEach((ancho) => {
+  // Desactivar un ancho
+  disableAncho(ancho: IAncho) {
+    this.anchoService.disable(ancho.idAncho).subscribe({
+      next: () => {
+        ancho.estatus = false;
         this.messageService.add({
-          key: 'c',
-          sticky: true,
-          severity: 'warn',
-          summary: '¿Está seguro? Esta acción es irreversible y solo se puede elminar si no tiene transacciones asociadas',
-          detail: 'Confirmar para proceder con la eliminación',
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Ancho desactivado',
         });
-          
-        this.anchoService.deleteAncho(ancho.idAncho).subscribe({
-          next: () => {
-            this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo eliminar el ancho',
-            });
-            console.error(err);
-          },
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo desactivar el ancho',
         });
-      });
-      this.selectedAnchos = [];
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Éxito',
-        detail: 'Anchos eliminados',
-      });
-    }
+        console.error(err);
+      },
+    });
   }
 
-  // Eliminar un ancho
+  // Eliminar un ancho seleccionado
   deleteAncho(ancho: IAncho) {
-    this.anchoService.disableAncho(ancho.idAncho).subscribe({
+    this.anchoService.delete(ancho.idAncho).subscribe({
       next: () => {
         this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
         this.messageService.add({

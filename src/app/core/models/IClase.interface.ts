@@ -1,5 +1,5 @@
 export interface IClase {
-idCase: number;
+idClase: number;
 clase: string;
 descripcion: string;
 estatus: boolean;

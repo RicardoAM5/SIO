@@ -1,6 +1,15 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AnchoService } from './services/ancho.service';
+import { CalibreService } from './services/calibre.service';
+import { CategoriaService } from './services/categoria.service';
+import { ClaseService } from './services/clase.service';
+import { ClasificacionService } from './services/clasificacion.service';
+import { DivisionService } from './services/division.service';
+import { GradoService } from './services/grado.service';
+import { GramajeService } from './services/gramaje.service';
+import { MolinoService } from './services/molino.service';
+import { TipoService } from './services/tipo.service';
 
 
 @NgModule({
@@ -9,6 +18,15 @@ import { AnchoService } from './services/ancho.service';
   ],
   providers: [
     AnchoService,
+    CalibreService,
+    CategoriaService,
+    ClaseService,
+    ClasificacionService,
+    DivisionService,
+    GradoService,
+    GramajeService,
+    MolinoService,
+    TipoService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
