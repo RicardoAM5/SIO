@@ -1,16 +1,16 @@
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
 import { AppLayoutModule } from './layout/app.layout.module';
-import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-
+import { MessageService } from 'primeng/api';
 
 @NgModule({
-    declarations: [AppComponent, NotfoundComponent],
+    declarations: [AppComponent],
     imports: [AppRoutingModule, AppLayoutModule],
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
+        MessageService,
     ],
     bootstrap: [AppComponent],
 })

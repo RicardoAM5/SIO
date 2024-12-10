@@ -1,24 +1,79 @@
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-import { AppLayoutComponent } from "./layout/app.layout.component";
+import { AppLayoutComponent } from './layout/app.layout.component';
+import { NotfoundComponent } from './components/notfound/notfound.component';
 
 @NgModule({
     imports: [
-        RouterModule.forRoot([
+        RouterModule.forRoot(
+            [
+                {
+                    path: '',
+                    component: AppLayoutComponent,
+                    children: [
+                        {
+                            path: '',
+                            loadChildren: () =>
+                                import(
+                                    './modules/ancho/ancho.module'
+                                ).then((m) => m.AnchoModule),
+                        },
+                        {
+                            path: 'productos-maestros',
+                            loadChildren: () =>
+                                import(
+                                    './modules/ancho/ancho.module'
+                                ).then((m) => m.AnchoModule),
+                        },
+                        {
+                            path: 'productos',
+                            loadChildren: () =>
+                                import(
+                                    './modules/ancho/ancho.module'
+                                ).then((m) => m.AnchoModule),
+                        },
+                        {
+                            path: 'ancho',
+                            loadChildren: () =>
+                                import(
+                                    './modules/ancho/ancho.module'
+                                ).then((m) => m.AnchoModule),
+                        },
+                        {
+                            path: 'ancho',
+                            loadChildren: () =>
+                                import(
+                                    './modules/ancho/ancho.module'
+                                ).then((m) => m.AnchoModule),
+                        },
+                        {
+                            path: 'ancho/venta',
+                            loadChildren: () =>
+                                import(
+                                    './modules/ancho/ancho.module'
+                                ).then((m) => m.AnchoModule),
+                        },
+                        {
+                            path: 'ancho',
+                            loadChildren: () =>
+                                import(
+                                    './modules/ancho/ancho.module'
+                                ).then((m) => m.AnchoModule),
+                        },
+             
+                    ],
+                },
+         
+                { path: 'notfound', component: NotfoundComponent },
+                { path: '**', redirectTo: '/notfound' },
+            ],
             {
-                path: '', component: AppLayoutComponent,
-                children: [
-                    { path: '', loadChildren: () => import('./demo/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
-                ]
-            },
-            { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
-            { path: 'landing', loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule) },
-            { path: 'notfound', component: NotfoundComponent },
-            { path: '**', redirectTo: '/notfound' },
-        ], { scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', onSameUrlNavigation: 'reload' })
+                scrollPositionRestoration: 'enabled',
+                anchorScrolling: 'enabled',
+                onSameUrlNavigation: 'reload',
+            }
+        ),
     ],
-    exports: [RouterModule]
+    exports: [RouterModule],
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule {}

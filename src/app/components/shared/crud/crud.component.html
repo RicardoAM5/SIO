@@ -1,0 +1,151 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+
+            <h3>{{modulo}}</h3>
+
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2"
+                            (click)="agregar()"></button>
+                        <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger"
+                            (click)="deleteSelectedItems()"
+                            [disabled]="!selectedItems || !selectedItems.length"></button>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="right">
+                    <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"
+                        (click)="dt.exportCSV()"></button>
+                </ng-template>
+            </p-toolbar>
+
+            <!-- Tabla genérica -->
+            <p-table #dt [value]="data" [columns]="cols" responsiveLayout="scroll" [rows]="10"
+                [globalFilterFields]="globalFilterFields" [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+                [(selection)]="selectedItems" selectionMode="multiple" [rowHover]="true" dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">{{ tableTitle }}</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th *ngFor="let col of cols" [pSortableColumn]="col.field">{{col.header}} <p-sortIcon
+                                [field]="col.field"></p-sortIcon></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-item>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                        </td>
+
+                        <td *ngFor="let col of cols">
+                            <span class="p-column-title">{{ col.header }}</span>
+
+                            <!-- Verificar si la columna es un objeto anidado -->
+                            <ng-container *ngIf="!isNestedField(item, col.field)">
+                                <!-- Si no es anidado, mostrar el valor directamente -->
+                                {{ item[col.field] }}
+                            </ng-container>
+
+                            <!-- Si es un campo anidado, recorrer las propiedades del objeto -->
+                            <ng-container *ngIf="isNestedField(item, col.field)">
+                                {{ getNestedFieldValue(item, col.field) }}
+                            </ng-container>
+                        </td>
+
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2" (click)="editItem(item)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                                    (click)="deleteItem(item)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="itemDialog" [style]="{width: '450px'}" [header]="isEditMode ? 'Editar' : 'Agregar'"
+            [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <form [formGroup]="form">
+                    <div *ngFor="let field of dialogFields" class="field">
+                        <label [for]="field.key">{{field.label}}</label>
+
+                        <!-- Campo de texto -->
+                        <input *ngIf="field.type === 'text'" pInputText [id]="field.key" formControlName="{{field.key}}"
+                            [placeholder]="field.placeholder || ''" [class.ng-dirty]="form.get(field.key).dirty" />
+
+                        <!-- Campo de texto área -->
+                        <textarea *ngIf="field.type === 'textarea'" pInputTextarea [id]="field.key"
+                            formControlName="{{field.key}}" [rows]="3"></textarea>
+
+                        <!-- Campo de dropdown -->
+                        <p-dropdown *ngIf="field.type === 'dropdown'" formControlName="{{field.key}}"
+                            [options]="field.options" placeholder="Select"></p-dropdown>
+
+                        <!-- Campo numérico -->
+                        <p-inputNumber *ngIf="field.type === 'number'" [id]="field.key"
+                            formControlName="{{field.key}}"></p-inputNumber>
+
+                        <!-- Mensaje de error de validación -->
+                        <div *ngIf="form.get(field.key)?.invalid && submitted" class="error-message">
+                            El campo {{field.label}} es obligatorio.
+                        </div>
+                    </div>
+                </form>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialog()"></button>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
+                    (click)="saveItem()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteItemDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="selectedItems">¿Está seguro de eliminar los elementos?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="deleteItemDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteItemsDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span>¿Está seguro de eliminar el elemento?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
+                    (click)="deleteItemsDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes"
+                    (click)="confirmDeleteSelected()"></button>
+            </ng-template>
+        </p-dialog>
+
+    </div>
+</div>
