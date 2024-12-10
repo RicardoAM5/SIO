@@ -19,12 +19,12 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Productos Maestros',
                         icon: 'pi pi-table',
-                        routerLink: ['/ancho'],
+                        routerLink: ['catalogos/producto-maestro'],
                     },
                     {
                         label: 'Productos',
                         icon: 'pi pi-th-large',
-                        routerLink: ['/calibre'],
+                        routerLink: ['catalogos/producto'],
                     },
                 ],
             },
@@ -34,32 +34,20 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'RM',
                         icon: 'pi pi-chart-line',
-                        routerLink: ['/ancho'],
+                        routerLink: ['planificacion-oc/rm'],
                     },
                     {
                         label: 'Grupos',
                         icon: 'pi pi-sitemap',
-                        routerLink: ['/ancho'],
+                        routerLink: ['planificacion-oc/grupos'],
                     },
                     {
                         label: 'Generacion OC',
                         icon: 'pi pi-cart-plus',
-                        routerLink: ['/ancho'],
+                        routerLink: ['planificacion-oc/oc'],
                     },
                     
                 ],
-            },
-            {
-                label: 'Administración',
-                items: [
-                    {
-                        label: 'Firmado y Sellado',
-                        icon: 'pi pi-file',
-                        routerLink: ['/ancho'],
-                    },
-
-                ],
-                
             },
             {
                 label: 'Control',

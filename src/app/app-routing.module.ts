@@ -14,6 +14,14 @@ import { NotfoundComponent } from './modules/notfound/notfound.component';
                             path: 'atributos',
                             loadChildren: () =>import('./modules/atributos/atributos.module').then((m) => m.AtributosModule),
                         },
+                        {
+                            path: 'catalogos',
+                            loadChildren: () =>import('./modules/catalogo-productos/catalogos.module').then((m) => m.CatalogosModule),
+                        },
+                        {
+                            path: 'planificacion-oc',
+                            loadChildren: () =>import('./modules/planificacion-oc/planificacion-oc.module').then((m) => m.PlanificacionOCModule),
+                        }
                     ],
                 },
                 { path: 'notfound', component: NotfoundComponent },
