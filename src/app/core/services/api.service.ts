@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environments.development';
 
@@ -12,7 +12,8 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   get<T>(endpoint: string, params?: any): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}${endpoint}`, { params }); 
+    const httpParams = new HttpParams({ fromObject: params || {} }); // Manejo correcto de parámetros
+    return this.http.get<T>(`${this.baseUrl}${endpoint}`, { params: httpParams });
   }
 
   post<T>(endpoint: string, body: any): Observable<T> {

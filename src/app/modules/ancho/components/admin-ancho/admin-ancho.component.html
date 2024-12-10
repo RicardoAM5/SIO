@@ -1,3 +1,53 @@
-<p>
-  admin-ancho works!
-</p>
+<div>
+  <h1>Anchos</h1>
+</div>
+<hr>
+
+<div class="card">
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
+      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedAnchos.length" (onClick)="deleteSelectedAnchos()"></p-button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table [value]="anchos" [(selection)]="selectedAnchos" [rows]="10" [paginator]="true" dataKey="idAncho">
+    <ng-template pTemplate="header">
+      <tr>
+        <th><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+        <th pSortableColumn="ancho">Ancho</th>
+        <th pSortableColumn="sufijo">Sufijo</th>
+        <th pSortableColumn="estatus">Estatus</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-ancho>
+      <tr>
+        <td><p-tableCheckbox [value]="ancho"></p-tableCheckbox></td>
+        <td>{{ ancho.ancho }}</td>
+        <td>{{ ancho.sufijo }}</td>
+        <td>{{ ancho.estatus ? 'Activo' : 'Inactivo' }}</td>
+        <td>
+          <p-button icon="pi pi-pencil" (onClick)="editAncho(ancho)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="anchoDialog" header="Detalles del Ancho" [modal]="true">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="ancho">Ancho</label>
+        <input id="ancho" type="number" [(ngModel)]="ancho.ancho" />
+      </div>
+      <div class="field">
+        <label for="sufijo">Sufijo</label>
+        <input id="sufijo" type="text" [(ngModel)]="ancho.sufijo" />
+      </div>
+    </div>
+    <p-footer>
+      <button type="button" (click)="hideDialog()">Cancelar</button>
+      <button type="button" (click)="saveAncho()">Guardar</button>
+    </p-footer>
+  </p-dialog>
+</div>

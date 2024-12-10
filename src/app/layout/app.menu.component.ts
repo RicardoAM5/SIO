@@ -62,7 +62,7 @@ export class AppMenuComponent implements OnInit {
                 
             },
             {
-                label: 'Administración',
+                label: 'Control',
                 items: [
                     {
                         label: 'Tipos',
