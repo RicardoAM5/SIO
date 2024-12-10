@@ -11,8 +11,8 @@ import { NotfoundComponent } from './modules/notfound/notfound.component';
                     component: AppLayoutComponent,
                     children: [
                         {
-                            path: 'ancho',
-                            loadChildren: () => import('./modules/ancho/ancho.module').then((m) => m.AnchoModule),
+                            path: 'atributos',
+                            loadChildren: () =>import('./modules/atributos/atributos.module').then((m) => m.AtributosModule),
                         },
                     ],
                 },

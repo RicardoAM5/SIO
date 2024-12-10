@@ -66,44 +66,44 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     {
                         label: 'Tipos',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/tipo'],
                     },
                 
                     {
                         label: 'Clases',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/clase'],
                     },
                     {
                         label: 'Calibres',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/calibre'],
                     },
                     {
                         label: 'Gramajes',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/gramaje'],
                     },
                     {
                         label: 'Molinos',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/molino'],
                     },   
                     {
                         label: 'Grado',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/grado'],
                     },   
                     {
                         label: 'Anchos',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/ancho'],
                     },   
                     {
                         label: 'Clasificaciones',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/clasificacion'],
                     },
                     {
                         label: 'Categorias',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/categoria'],
                     },   
                     {
                         label: 'Divisiones',
-                        routerLink: ['/ancho'],
+                        routerLink: ['atributos/division'],
                     },  
                 ],
             },
