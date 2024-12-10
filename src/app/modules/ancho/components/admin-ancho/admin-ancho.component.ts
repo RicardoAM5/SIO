@@ -23,14 +23,21 @@ export class AdminAnchoComponent implements OnInit {
 
   constructor(
     private anchoService: AnchoService,
-    private messageService: MessageService
+    public messageService: MessageService
   ) {}
 
   ngOnInit() {
-    this.messageService.add({severity:'success', summary: 'Success', detail: 'Message Content'});
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Prueba',
+      detail: 'Este es un mensaje de prueba',
 
+    });
     this.getAllAnchos();
+
   }
+  
+
 
   // Obtener todos los anchos
   getAllAnchos() {
@@ -129,10 +136,44 @@ export class AdminAnchoComponent implements OnInit {
     this.anchoDialog = true;
   }
 
+
+  
+  // Eliminar un ancho
+  activeAncho(ancho: IAncho) {
+    this.anchoService.activeAncho(ancho.idAncho).subscribe({
+      next: () => {
+        this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Ancho activado',
+        });
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo activar el ancho',
+        });
+        console.error(err);
+      },
+    });
+  }
+  
+
+
   // Eliminar anchos seleccionados
   deleteSelectedAnchos() {
     if (this.selectedAnchos.length > 0) {
       this.selectedAnchos.forEach((ancho) => {
+        this.messageService.add({
+          key: 'c',
+          sticky: true,
+          severity: 'warn',
+          summary: '¿Está seguro? Esta acción es irreversible y solo se puede elminar si no tiene transacciones asociadas',
+          detail: 'Confirmar para proceder con la eliminación',
+        });
+          
         this.anchoService.deleteAncho(ancho.idAncho).subscribe({
           next: () => {
             this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
@@ -158,7 +199,7 @@ export class AdminAnchoComponent implements OnInit {
 
   // Eliminar un ancho
   deleteAncho(ancho: IAncho) {
-    this.anchoService.deleteAncho(ancho.idAncho).subscribe({
+    this.anchoService.disableAncho(ancho.idAncho).subscribe({
       next: () => {
         this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
         this.messageService.add({

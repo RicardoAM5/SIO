@@ -19,7 +19,8 @@ import { PrimeNgModule } from 'src/app/components/shared/prime-ng.module';
     ReactiveFormsModule,
     CoreModule,
     AnchoRoutingModule,
-    PrimeNgModule
+    PrimeNgModule,
+
 
   ],
   exports: [

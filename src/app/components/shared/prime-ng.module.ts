@@ -17,7 +17,6 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
-  
   exports: [
     ButtonModule,
     DropdownModule,

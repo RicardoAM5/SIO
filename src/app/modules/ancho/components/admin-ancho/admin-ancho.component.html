@@ -14,7 +14,7 @@
   <p-table [value]="anchos" [(selection)]="selectedAnchos" [rows]="10" [paginator]="true" dataKey="idAncho">
     <ng-template pTemplate="header">
       <tr>
-        <th><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+        <th pSortableColumn=""></th>
         <th pSortableColumn="ancho">Ancho</th>
         <th pSortableColumn="sufijo">Sufijo</th>
         <th pSortableColumn="estatus">Estatus</th>
@@ -29,6 +29,10 @@
         <td>{{ ancho.estatus ? 'Activo' : 'Inactivo' }}</td>
         <td>
           <p-button icon="pi pi-pencil" (onClick)="editAncho(ancho)"></p-button>
+          <p-button icon="pi pi-trash" (onClick)="deleteAncho(ancho)"  severity="danger"></p-button>
+          <p-button icon="pi pi-undo" (onClick)="activeAncho(ancho)" severity ="success" ></p-button>
+
+
         </td>
       </tr>
     </ng-template>
@@ -38,16 +42,19 @@
     <div class="p-fluid">
       <div class="field">
         <label for="ancho">Ancho</label>
-        <input id="ancho" type="number" [(ngModel)]="ancho.ancho" />
+        <input id="ancho" type="number" pInputText [(ngModel)]="ancho.ancho" required />
       </div>
       <div class="field">
         <label for="sufijo">Sufijo</label>
-        <input id="sufijo" type="text" [(ngModel)]="ancho.sufijo" />
+        <input id="sufijo" type="text" pInputText [(ngModel)]="ancho.sufijo" required/>
       </div>
     </div>
+
     <p-footer>
-      <button type="button" (click)="hideDialog()">Cancelar</button>
-      <button type="button" (click)="saveAncho()">Guardar</button>
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text"
+        (click)="hideDialog()"></button>
+      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text"
+        (click)="saveAncho()"></button>
     </p-footer>
   </p-dialog>
 </div>
