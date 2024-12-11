@@ -18,20 +18,47 @@
        
             </div>
           </ng-template>
+          <ng-template pTemplate="right">
+            <button
+              pButton
+              pRipple
+              label="Exportar CSV"
+              icon="pi pi-upload"
+              class="p-button-help"
+              (click)="exportCSV(dt)"
+            ></button>
+          </ng-template>
         </p-toolbar>
   
         <p-table
-        [value]="data"
-        [paginator]="true"
-        [rows]="10"
-        [rowsPerPageOptions]="[10, 20, 30]"
-        [dataKey]="'id'"
-        [responsiveLayout]="'scroll'"
+          #dt
+          [value]="data"
+          [paginator]="true"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          [globalFilterFields]="globalFilterFields"
+          [rowsPerPageOptions]="[10, 20, 30]"
+          [dataKey]="'id'"
+          [responsiveLayout]="'scroll'"
         >
+          <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+              <h5 class="m-0">{{ tableTitle }}</h5>
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input
+                  pInputText
+                  type="text"
+                  (input)="onGlobalFilter(dt, $event)"
+                  placeholder="Buscar..."
+                  class="w-full sm:w-auto"
+                />
+              </span>
+            </div>
+          </ng-template>
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 3rem">
-              </th>
+              <th style="width: 3rem"></th>
               <th *ngFor="let col of cols" [pSortableColumn]="col.field">
                 {{ col.header }}
                 <p-sortIcon [field]="col.field"></p-sortIcon>
@@ -41,8 +68,7 @@
           </ng-template>
           <ng-template pTemplate="body" let-item>
             <tr>
-              <td>
-              </td>
+              <td></td>
               <td *ngFor="let col of cols">
                 <ng-container *ngIf="!isNestedField(item, col.field)">
                   {{ item[col.field] }}
@@ -70,13 +96,12 @@
                     (click)="toggleItemEstatus(item)"
                   ></button>
                   <button
-                  pButton
-                  pRipple
-                  icon="pi pi-times"
-                  class="p-button-rounded p-button-danger"
-                  (click)="deleteItem(item)"
-                ></button>
-                
+                    pButton
+                    pRipple
+                    icon="pi pi-times"
+                    class="p-button-rounded p-button-danger"
+                    (click)="deleteItem(item)"
+                  ></button>
                 </div>
               </td>
             </tr>
@@ -86,8 +111,6 @@
     </div>
   </div>
   
-  
-  <!-- Diálogo para Agregar/Editar -->
   <p-dialog
     [(visible)]="itemDialog"
     header="{{ currentItem ? 'Editar' : 'Nuevo' }} {{ modulo }}"
@@ -122,7 +145,6 @@
           [placeholder]="'Seleccionar...'"
         ></p-dropdown>
   
-        <!-- Validaciones -->
         <div *ngIf="submitted && form.get(field.key)?.invalid" class="error-message">
           {{ field.label }} es obligatorio.
         </div>
@@ -149,5 +171,6 @@
       ></button>
     </p-footer>
   </p-dialog>
-
+  
   <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  

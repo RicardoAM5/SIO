@@ -5,96 +5,105 @@ import { PrimeNgModule } from '../prime-ng.module';
 import { MessageService } from 'primeng/api';
 
 @Component({
-    selector: 'app-crud',
-    templateUrl: './crud.component.html',
-    standalone: true,
-    imports: [PrimeNgModule],
+  selector: 'app-crud',
+  templateUrl: './crud.component.html',
+  standalone: true,
+  imports: [PrimeNgModule],
 })
 export class CrudComponent<T extends { id?: number; estatus?: boolean }>
-    implements OnInit
+  implements OnInit
 {
-    @Input() data: T[] = [];
-    @Input() cols: { field: string; header: string }[] = [];
-    @Input() globalFilterFields: string[] = [];
-    @Input() tableTitle: string = '';
-    @Input() dialogFields: any[] = [];
-    @Input() modulo: string = '';
+  @Input() data: T[] = [];
+  @Input() cols: { field: string; header: string }[] = [];
+  @Input() globalFilterFields: string[] = [];
+  @Input() tableTitle: string = '';
+  @Input() dialogFields: any[] = [];
+  @Input() modulo: string = '';
 
-    @Output() save = new EventEmitter<T>();
-    @Output() delete = new EventEmitter<T>();
-    @Output() toggleEstatus = new EventEmitter<T>();
+  @Output() save = new EventEmitter<T>();
+  @Output() delete = new EventEmitter<T>();
+  @Output() toggleEstatus = new EventEmitter<T>();
 
-    itemDialog: boolean = false;
-    form: FormGroup;
-    submitted: boolean = false;
-    currentItem: T | null = null;
+  itemDialog: boolean = false;
+  form: FormGroup;
+  submitted: boolean = false;
+  currentItem: T | null = null;
 
-    constructor(
-        private fb: FormBuilder,
-        private messageService: MessageService
-    ) {
-        this.form = this.fb.group({});
+  constructor(
+    private fb: FormBuilder,
+    private messageService: MessageService
+  ) {
+    this.form = this.fb.group({});
+  }
+
+  ngOnInit(): void {
+    this.setupForm();
+  }
+
+  setupForm(): void {
+    const controls = this.dialogFields.reduce((acc, field) => {
+      acc[field.key] = ['', field.required ? Validators.required : null];
+      return acc;
+    }, {});
+    this.form = this.fb.group(controls);
+  }
+
+  onGlobalFilter(table: Table, event: Event): void {
+    const value = (event.target as HTMLInputElement).value.trim();
+    table.filterGlobal(value, 'contains');
+  }
+
+  exportCSV(table: Table): void {
+    table.exportCSV();
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exportado',
+      detail: 'Datos exportados a CSV correctamente',
+    });
+  }
+
+  openDialog(isEdit: boolean, item?: T): void {
+    this.itemDialog = true;
+    this.submitted = false;
+    if (isEdit && item) {
+      this.currentItem = { ...item };
+      this.form.patchValue(item);
+    } else {
+      this.form.reset();
+      this.currentItem = null;
     }
+  }
 
-    ngOnInit(): void {
-        this.setupForm();
-    }
+  saveItem(): void {
+    this.submitted = true;
+    if (this.form.invalid) return;
 
-    setupForm(): void {
-        const controls = this.dialogFields.reduce((acc, field) => {
-            acc[field.key] = ['', field.required ? Validators.required : null];
-            return acc;
-        }, {});
-        this.form = this.fb.group(controls);
-    }
+    const itemToSave = this.currentItem
+      ? { ...this.currentItem, ...this.form.value }
+      : { ...this.form.value };
 
-    onGlobalFilter(table: Table, event: Event): void {
-        const value = (event.target as HTMLInputElement).value.trim();
-        table.filterGlobal(value, 'contains');
-    }
+    this.save.emit(itemToSave as T);
+    this.itemDialog = false;
+  }
 
-    openDialog(isEdit: boolean, item?: T): void {
-        this.itemDialog = true;
-        this.submitted = false;
-        if (isEdit && item) {
-            this.currentItem = { ...item };
-            this.form.patchValue(item);
-        } else {
-            this.form.reset();
-            this.currentItem = null;
-        }
-    }
+  toggleItemEstatus(item: T): void {
+    this.toggleEstatus.emit(item);
+  }
 
-    saveItem(): void {
-        this.submitted = true;
-        if (this.form.invalid) return;
+  deleteItem(item: T): void {
+    this.delete.emit(item);
+  }
 
-        const itemToSave = this.currentItem
-            ? { ...this.currentItem, ...this.form.value }
-            : { ...this.form.value };
+  hideDialog(): void {
+    this.itemDialog = false;
+    this.submitted = false;
+  }
 
-        this.save.emit(itemToSave as T);
-        this.itemDialog = false;
-    }
+  isNestedField(item: any, field: string): boolean {
+    return field.includes('.');
+  }
 
-    toggleItemEstatus(item: T): void {
-        this.toggleEstatus.emit(item);
-    }
-
-    deleteItem(item: T): void {
-        this.delete.emit(item);
-    }
-
-    hideDialog(): void {
-        this.itemDialog = false;
-        this.submitted = false;
-    }
-
-    isNestedField(item: any, field: string): boolean {
-        return field.includes('.');
-    }
-
-    getNestedFieldValue(item: any, field: string): any {
-        return field.split('.').reduce((acc, key) => acc?.[key], item);
-    }
+  getNestedFieldValue(item: any, field: string): any {
+    return field.split('.').reduce((acc, key) => acc?.[key], item);
+  }
 }
