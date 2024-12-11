@@ -16,6 +16,8 @@ import { AdminGradoComponent } from './components/grado/admin-grado/admin-grado.
 import { AdminGramajeComponent } from './components/gramaje/admin-gramaje/admin-gramaje.component';
 import { AdminMolinoComponent } from './components/molino/admin-molino/admin-molino.component';
 import { AdminTipoComponent } from './components/tipo/admin-tipos/admin-tipos.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
 
 
 @NgModule({
@@ -44,7 +46,8 @@ import { AdminTipoComponent } from './components/tipo/admin-tipos/admin-tipos.co
     AtributosRoutingModule
   ],
   providers: [
-    MessageService
+    MessageService,
+    
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

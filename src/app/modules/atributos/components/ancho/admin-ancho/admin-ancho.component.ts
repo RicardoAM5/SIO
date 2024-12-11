@@ -172,6 +172,16 @@ export class AdminAnchoComponent implements OnInit {
 
   // Eliminar un ancho seleccionado
   deleteAncho(ancho: IAncho) {
+    //advertencia de eliminación fisica
+    this.messageService.add({
+      severity: 'warn',
+      summary: '¿Estás seguro?',
+      detail: 'Confirmar eliminación',
+    });
+    //si vuelve a dar otro clik se elimina
+    
+
+
     this.anchoService.delete(ancho.idAncho).subscribe({
       next: () => {
         this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);

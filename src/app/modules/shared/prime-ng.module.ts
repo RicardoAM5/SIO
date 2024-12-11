@@ -38,6 +38,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     ConfirmDialogModule,
     CommonModule,
     FormsModule
+    
   ],
   providers: [
     MessageService
