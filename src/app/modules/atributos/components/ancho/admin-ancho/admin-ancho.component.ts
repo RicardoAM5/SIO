@@ -1,210 +1,142 @@
 import { Component, OnInit } from '@angular/core';
 import { AnchoService } from 'src/app/core/services/ancho.service';
 import { IAncho } from 'src/app/core/models/IAncho.interface';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-ancho',
   templateUrl: './admin-ancho.component.html',
   styleUrls: ['./admin-ancho.component.css'],
-  providers: [MessageService],
 })
 export class AdminAnchoComponent implements OnInit {
-  public anchos: IAncho[] = [];
-  public selectedAnchos: IAncho[] = [];
-  public anchoDialog: boolean = false;
-  public ancho: IAncho = {
-    idAncho: 0,
-    ancho: 0,
-    sufijo: '',
-    estatus: true,
-  };
-  public submitted: boolean = false;
+  anchos: IAncho[] = [];
+  selectedAnchos: IAncho[] = [];
+  cols = [
+    { field: 'ancho', header: 'Ancho' },
+    { field: 'sufijo', header: 'Sufijo' },
+    { field: 'estatus', header: 'Estatus' },
+  ];
+  globalFilterFields = ['ancho', 'sufijo', 'estatus'];
+  tableTitle = 'Gestión de Anchos';
+  dialogFields = [
+    { key: 'ancho', label: 'Ancho', type: 'number', required: true },
+    { key: 'sufijo', label: 'Sufijo', type: 'text', required: true },
+    { key: 'estatus', label: 'Estatus', type: 'dropdown', options: [
+      { label: 'Activo', value: true },
+      { label: 'Inactivo', value: false },
+    ] },
+  ];
+  modulo = 'Administración de Anchos';
 
   constructor(
     private anchoService: AnchoService,
-    public messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAllAnchos();
   }
 
-  // Obtener todos los anchos
-  getAllAnchos() {
+  getAllAnchos(): void {
     this.anchoService.getAll().subscribe({
-      next: (data) => {
-        this.anchos = data;
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al cargar los anchos',
-        });
-        console.error(err);
-      },
+      next: (data) => (this.anchos = data),
+      error: () => this.showMessage('error', 'Error', 'Error al cargar los anchos'),
     });
   }
 
-  // Abrir diálogo para crear un nuevo ancho
-  openNew() {
-    this.ancho = {
-      idAncho: 0,
-      ancho: 0,
-      sufijo: '',
-      estatus: true,
-    };
-    this.submitted = false;
-    this.anchoDialog = true;
+  saveAncho(ancho: IAncho): void {
+    const saveOperation = ancho.idAncho
+      ? this.anchoService.update(ancho.idAncho, ancho)
+      : this.anchoService.save(ancho);
+
+    saveOperation.subscribe({
+      next: (savedAncho) => {
+        if (ancho.idAncho) {
+          const index = this.anchos.findIndex((a) => a.idAncho === savedAncho.idAncho);
+          if (index !== -1) this.anchos[index] = savedAncho;
+          this.showMessage('success', 'Actualizado', 'Ancho actualizado exitosamente');
+        } else {
+          this.anchos.push(savedAncho);
+          this.showMessage('success', 'Creado', 'Ancho creado exitosamente');
+        }
+      },
+      error: () => this.showMessage('error', 'Error', 'Error al guardar el ancho'),
+    });
   }
 
-  // Guardar un ancho (nuevo o editado)
-  saveAncho() {
-    this.submitted = true;
 
-    if (this.ancho.ancho > 0 && this.ancho.sufijo.trim()) {
-      if (this.ancho.idAncho === 0) {
-        // Crear nuevo ancho
-        this.anchoService.save(this.ancho).subscribe({
-          next: (data) => {
-            this.anchos.push(data);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Ancho creado',
-            });
+  delete(ancho: IAncho): void {
+    console.log('deletePhysicalAncho', ancho);
+
+    this.confirmationService.confirm({
+
+      message: `¿Está seguro de que desea eliminar físicamente el ancho "${ancho.ancho}"? Esta acción no se puede deshacer.`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.anchoService.delete(ancho.idAncho).subscribe({
+          next: () => {
+            this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
+            this.showMessage('success', 'Eliminado', 'Ancho eliminado físicamente con éxito.');
           },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear el ancho',
-            });
-            console.error(err);
+          error: () => {
+            this.showMessage('error', 'Error', 'Error al eliminar el ancho físicamente.');
           },
         });
-      } else {
-        // Editar ancho existente
-        this.anchoService.update(this.ancho.idAncho, this.ancho).subscribe({
-          next: (data) => {
-            const index = this.anchos.findIndex((a) => a.idAncho === data.idAncho);
-            if (index !== -1) {
-              this.anchos[index] = data;
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Ancho actualizado',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar el ancho',
-            });
-            console.error(err);
-          },
-        });
-      }
+      },
+    });
+  }
+  
 
-      this.anchos = [...this.anchos]; // Refrescar la tabla
-      this.anchoDialog = false;
-      this.ancho = {
-        idAncho: 0,
-        ancho: 0,
-        sufijo: '',
-        estatus: true,
-      };
+  
+
+  private showMessage(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
+  }
+
+  toggleEstatus(ancho: IAncho): void {
+    if (ancho.estatus) {
+      // Desactivar
+      this.anchoService.disable(ancho.idAncho).subscribe({
+        next: () => {
+          ancho.estatus = false;
+          this.showMessage('success', 'Éxito', `El ancho con ID ${ancho.idAncho} fue desactivado.`);
+        },
+        error: () => this.showMessage('error', 'Error', `No se pudo desactivar el ancho.`),
+      });
+    } else {
+      // Reactivar
+      this.anchoService.active(ancho.idAncho).subscribe({
+        next: () => {
+          ancho.estatus = true;
+          this.showMessage('success', 'Éxito', `El ancho con ID ${ancho.idAncho} fue reactivado.`);
+        },
+        error: () => this.showMessage('error', 'Error', `No se pudo reactivar el ancho.`),
+      });
     }
   }
 
-  // Editar un ancho
-  editAncho(ancho: IAncho) {
-    this.ancho = { ...ancho };
-    this.anchoDialog = true;
-  }
 
-  // Activar un ancho
-  activeAncho(ancho: IAncho) {
-    this.anchoService.active(ancho.idAncho).subscribe({
+
+
+
+  updateAncho(ancho: IAncho): void {
+    this.anchoService.update(ancho.idAncho, ancho).subscribe({
       next: () => {
-        ancho.estatus = true;
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Ancho activado',
+          detail: `El ancho con ID ${ancho.idAncho} ha sido actualizado.`,
         });
       },
-      error: (err) => {
+      error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo activar el ancho',
+          detail: `No se pudo actualizar el ancho con ID ${ancho.idAncho}.`,
         });
-        console.error(err);
       },
     });
-  }
-
-  // Desactivar un ancho
-  disableAncho(ancho: IAncho) {
-    this.anchoService.disable(ancho.idAncho).subscribe({
-      next: () => {
-        ancho.estatus = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Ancho desactivado',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo desactivar el ancho',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Eliminar un ancho seleccionado
-  deleteAncho(ancho: IAncho) {
-    //advertencia de eliminación fisica
-    this.messageService.add({
-      severity: 'warn',
-      summary: '¿Estás seguro?',
-      detail: 'Confirmar eliminación',
-    });
-    //si vuelve a dar otro clik se elimina
-    
-
-
-    this.anchoService.delete(ancho.idAncho).subscribe({
-      next: () => {
-        this.anchos = this.anchos.filter((a) => a.idAncho !== ancho.idAncho);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Ancho eliminado',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo eliminar el ancho',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Cerrar diálogo
-  hideDialog() {
-    this.anchoDialog = false;
-    this.submitted = false;
   }
 }

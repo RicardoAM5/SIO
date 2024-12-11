@@ -4,7 +4,7 @@ import {  ReactiveFormsModule } from '@angular/forms';
 import { AdminAnchoComponent } from './components/ancho/admin-ancho/admin-ancho.component';
 import { RouterModule } from '@angular/router';
 import { CoreModule } from 'src/app/core/core.module';
-import {  MessageService } from 'primeng/api';
+import {  ConfirmationService, MessageService } from 'primeng/api';
 import { PrimeNgModule } from 'src/app/modules/shared/prime-ng.module';
 import {  AtributosRoutingModule } from './atributos-routing.module';
 import { AdminCalibreComponent } from './components/calibre/admin-calibre/admin-calibre.component';
@@ -16,8 +16,8 @@ import { AdminGradoComponent } from './components/grado/admin-grado/admin-grado.
 import { AdminGramajeComponent } from './components/gramaje/admin-gramaje/admin-gramaje.component';
 import { AdminMolinoComponent } from './components/molino/admin-molino/admin-molino.component';
 import { AdminTipoComponent } from './components/tipo/admin-tipos/admin-tipos.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { BrowserModule } from '@angular/platform-browser';
+import { CrudComponent } from '../shared/crud/crud.component';
+
 
 
 @NgModule({
@@ -40,14 +40,15 @@ import { BrowserModule } from '@angular/platform-browser';
     ReactiveFormsModule,
     CoreModule,
     PrimeNgModule,
-    AtributosRoutingModule
+    AtributosRoutingModule,
+    AtributosRoutingModule,
+    CrudComponent
   ],
   exports: [
     AtributosRoutingModule
   ],
   providers: [
-    MessageService,
-    
+
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

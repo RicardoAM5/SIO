@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -9,16 +9,18 @@ import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   exports: [
     ButtonModule,
+    
     DropdownModule,
     InputNumberModule,
     ToolbarModule,
@@ -27,21 +29,21 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     TagModule,
     InputTextModule,
     DialogModule,
-    CommonModule,
-    FormsModule,
     CheckboxModule,
-    TableModule,
-    DialogModule,
-    InputTextModule,
     CalendarModule,
     ToastModule,
     ConfirmDialogModule,
     CommonModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
     
   ],
   providers: [
-    MessageService
+    MessageService,
+    ConfirmationService
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+
 })
 export class PrimeNgModule {}

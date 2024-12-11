@@ -1,62 +1,14 @@
-<div>
-  <h1>Anchos</h1>
-</div>
-<hr>
+<app-crud
+  [data]="anchos"
+  [cols]="cols"
+  [globalFilterFields]="['ancho', 'sufijo', 'estatus']"
+  [tableTitle]="'Gestión de Anchos'"
+  [modulo]="'Anchos'"
+  [dialogFields]="dialogFields"
+  (toggleEstatus)="toggleEstatus($event)"
+  (save)="saveAncho($event)"
+  (update)="updateAncho($event)"
+  (delete)="delete($event)" 
 
-<div class="card">
-  <p-toolbar styleClass="mb-4 gap-2">
-    <ng-template pTemplate="left">
-      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
-      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedAnchos.length" (onClick)="deleteSelectedAnchos()"></p-button>
-    </ng-template>
-  </p-toolbar>
+></app-crud>
 
-  <p-table [value]="anchos" [(selection)]="selectedAnchos" [rows]="10" [paginator]="true" dataKey="idAncho">
-    <ng-template pTemplate="header">
-      <tr>
-        <th pSortableColumn=""></th>
-        <th pSortableColumn="ancho">Ancho</th>
-        <th pSortableColumn="sufijo">Sufijo</th>
-        <th pSortableColumn="estatus">Estatus</th>
-        <th>Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-ancho>
-      <tr>
-        <td><p-tableCheckbox [value]="ancho"></p-tableCheckbox></td>
-        <td>{{ ancho.ancho }}</td>
-        <td>{{ ancho.sufijo }}</td>
-        <td>{{ ancho.estatus ? 'Activo' : 'Inactivo' }}</td>
-        <td>
-          <p-button icon="pi pi-pencil" (onClick)="editAncho(ancho)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="deleteAncho(ancho)"  severity="danger" *ngIf="ancho.estatus" ></p-button>
-          <p-button icon="pi pi-undo" (onClick)="activeAncho(ancho)" severity ="success" *ngIf="!ancho.estatus" ></p-button>
-
-
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
-  <p-dialog [(visible)]="anchoDialog" header="Detalles del Ancho" [modal]="true">
-    <div class="p-fluid">
-      <div class="field">
-        <label for="ancho">Ancho</label>
-        <input id="ancho" type="number" pInputText [(ngModel)]="ancho.ancho"  required />
-      </div>
-      <div class="field">
-        <label for="sufijo">Sufijo</label>
-        <input id="sufijo" type="text" pInputText [(ngModel)]="ancho.sufijo"  required/>
-      </div>
-    </div>
-
-    <p-footer>
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text"
-        (click)="hideDialog()"></button>
-      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text"
-        (click)="saveAncho()"></button>
-    </p-footer>
-  </p-dialog>
-</div>
-
-<p-toast position="top-right"></p-toast>
