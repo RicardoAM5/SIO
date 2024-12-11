@@ -15,7 +15,6 @@
                 class="p-button-success mr-2"
                 (click)="openDialog(false)"
               ></button>
-       
             </div>
           </ng-template>
           <ng-template pTemplate="right">
@@ -25,7 +24,7 @@
               label="Exportar CSV"
               icon="pi pi-upload"
               class="p-button-help"
-              (click)="exportCSV(dt)"
+              (click)="dt.exportCSV()"
             ></button>
           </ng-template>
         </p-toolbar>
@@ -40,6 +39,9 @@
           [rowsPerPageOptions]="[10, 20, 30]"
           [dataKey]="'id'"
           [responsiveLayout]="'scroll'"
+          [columns]="cols"
+          responsiveLayout="scroll"
+          [rowHover]="true"
         >
           <ng-template pTemplate="caption">
             <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
@@ -144,7 +146,7 @@
           formControlName="{{ field.key }}"
           [placeholder]="'Seleccionar...'"
         ></p-dropdown>
-  
+         <!-- Validaciones -->
         <div *ngIf="submitted && form.get(field.key)?.invalid" class="error-message">
           {{ field.label }} es obligatorio.
         </div>
@@ -171,6 +173,5 @@
       ></button>
     </p-footer>
   </p-dialog>
-  
+
   <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
-  
