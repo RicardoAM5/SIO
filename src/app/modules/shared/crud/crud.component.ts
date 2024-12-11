@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Table } from 'primeng/table';
 import { PrimeNgModule } from '../prime-ng.module';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-crud',
@@ -31,7 +30,6 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }>
 
   constructor(
     private fb: FormBuilder,
-    private messageService: MessageService
   ) {
     this.form = this.fb.group({});
   }
@@ -53,14 +51,7 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }>
     table.filterGlobal(value, 'contains');
   }
 
-  exportCSV(table: Table): void {
-    table.exportCSV();
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Exportado',
-      detail: 'Datos exportados a CSV correctamente',
-    });
-  }
+
 
   openDialog(isEdit: boolean, item?: T): void {
     this.itemDialog = true;
