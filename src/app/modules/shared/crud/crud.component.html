@@ -1,182 +1,191 @@
 <div class="grid">
     <div class="col-12">
-      <div class="card px-6 py-6">
-        <h3>{{ modulo }}</h3>
-  
-        <p-toast></p-toast>
-        <p-toolbar styleClass="mb-4">
-          <ng-template pTemplate="left">
-            <div class="my-2">
-              <button
-                pButton
-                pRipple
-                label="Nuevo"
-                icon="pi pi-plus"
-                class="p-button-success mr-2"
-                (click)="openDialog(false)"
-              ></button>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="right">
-            <button
-              pButton
-              pRipple
-              label="Exportar CSV"
-              icon="pi pi-upload"
-              class="p-button-help"
-              (click)="dt.exportCSV()"
-            ></button>
-          </ng-template>
-        </p-toolbar>
-  
-        <p-table
-          #dt
-          [value]="data"
-          [paginator]="true"
-          [rows]="10"
-          [showCurrentPageReport]="true"
-          [globalFilterFields]="globalFilterFields"
-          [rowsPerPageOptions]="[10, 20, 30]"
-          [dataKey]="'id'"
-          [responsiveLayout]="'scroll'"
-          [columns]="cols"
-          [rowHover]="true"
-        >
-          <ng-template pTemplate="caption">
-            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-              <h5 class="m-0">{{ tableTitle }}</h5>
-              <span class="block mt-2 md:mt-0 p-input-icon-left">
-                <i class="pi pi-search"></i>
-                <input
-                  pInputText
-                  type="text"
-                  (input)="onGlobalFilter(dt, $event)"
-                  placeholder="Buscar..."
-                  class="w-full sm:w-auto"
-                />
-              </span>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 3rem"></th>
-              <th *ngFor="let col of cols" [pSortableColumn]="col.field">
-                {{ col.header }}
-                <p-sortIcon [field]="col.field"></p-sortIcon>
-              </th>
-              <th>Acciones</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item>
-            <tr>
-              <td></td>
-              <td *ngFor="let col of cols">
-                <ng-container *ngIf="!isNestedField(item, col.field)">
-                  <ng-container *ngIf="col.field === 'estatus'">
-                    {{ item[col.field] ? 'Activo' : 'Inactivo' }}
-                  </ng-container>
-                  <ng-container *ngIf="col.field !== 'estatus'">
-                    {{ item[col.field] }}
-                  </ng-container>
-                </ng-container>
-                <ng-container *ngIf="isNestedField(item, col.field)">
-                  {{ getNestedFieldValue(item, col.field) }}
-                </ng-container>
-              </td>
-              <td>
-                <div class="flex">
-                  <button
-                    pButton
-                    pRipple
-                    icon="pi pi-pencil"
-                    class="p-button-rounded p-button-success mr-2"
-                    (click)="openDialog(true, item)"
-                  ></button>
-                  <button
-                    pButton
-                    pRipple
-                    [icon]="item.estatus ? 'pi pi-trash' : 'pi pi-undo'"
-                    [class.p-button-secondary]="item.estatus"
-                    [class.p-button-success]="!item.estatus"
-                    class="p-button-rounded"
-                    (click)="toggleItemEstatus(item)"
-                  ></button>
-                  <button
-                    pButton
-                    pRipple
-                    icon="pi pi-times"
-                    class="p-button-rounded p-button-danger ml-2"
-                    (click)="deleteItem(item)"
-                  ></button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
+        <div class="card px-6 py-6">
+            <h3>{{ modulo }}</h3>
+
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button
+                            pButton
+                            pRipple
+                            icon="pi pi-plus"
+                            class="p-button-success mr-2"
+                            (click)="openDialog(false)"
+                        ></button>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="right">
+                    <button
+                        pButton
+                        pRipple
+                        icon="pi pi-upload"
+                        class="p-button-help"
+                        (click)="dt.exportCSV()"
+                    ></button>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table
+                #dt
+                [value]="data"
+                [paginator]="true"
+                [rows]="10"
+                [showCurrentPageReport]="true"
+                [globalFilterFields]="globalFilterFields"
+                [rowsPerPageOptions]="[10, 20, 30]"
+                [dataKey]="'id'"
+                [responsiveLayout]="'scroll'"
+                [columns]="cols"
+                [rowHover]="true"
+            >
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                (input)="onGlobalFilter(dt, $event)"
+                                placeholder="Buscar..."
+                                class="w-full sm:w-auto"
+                            />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem"></th>
+                        <th
+                            *ngFor="let col of cols"
+                            [pSortableColumn]="col.field"
+                        >
+                            {{ col.header }}
+                            <p-sortIcon [field]="col.field"></p-sortIcon>
+                        </th>
+                        <th>Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-item>
+                    <tr>
+                        <td></td>
+                        <td *ngFor="let col of cols">
+                            <ng-container
+                                *ngIf="!isNestedField(item, col.field)"
+                            >
+                                <ng-container *ngIf="col.field === 'estatus'">
+                                    {{
+                                        item[col.field] ? "Activo" : "Inactivo"
+                                    }}
+                                </ng-container>
+                                <ng-container *ngIf="col.field !== 'estatus'">
+                                    {{ item[col.field] }}
+                                </ng-container>
+                            </ng-container>
+                            <ng-container
+                                *ngIf="isNestedField(item, col.field)"
+                            >
+                                {{ getNestedFieldValue(item, col.field) }}
+                            </ng-container>
+                        </td>
+                        <td>
+                            <div class="flex align-items-center">
+                                <i
+                                    class="pi pi-pencil text-success cursor-pointer mr-2"
+                                    (click)="openDialog(true, item)"
+                                    title="Editar"
+                                ></i>
+                                <i
+                                    class="pi pi-arrow-right-arrow-left cursor-pointer"
+                                    [ngClass]="{
+                                        'text-danger': item.estatus,
+                                        'text-success': !item.estatus
+                                    }"
+                                    (click)="toggleItemEstatus(item)"
+                                    title="Cambiar estatus"
+                                ></i>
+                                <i
+                                    class="pi pi-trash text-danger cursor-pointer ml-2"
+                                    (click)="deleteItem(item)"
+                                    title="Eliminar"
+                                ></i>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
     </div>
-  </div>
-  
-  <p-dialog
+</div>
+
+<p-dialog
     [(visible)]="itemDialog"
     header="{{ currentItem ? 'Editar' : 'Nuevo' }} {{ modulo }}"
     [modal]="true"
     class="p-fluid"
     [style]="{ width: '450px' }"
-  >
+>
     <form [formGroup]="form">
-      <div *ngFor="let field of dialogFields" class="field">
-        <label [for]="field.key">{{ field.label }}</label>
-  
-        <input
-          *ngIf="field.type === 'text'"
-          id="{{ field.key }}"
-          type="text"
-          pInputText
-          formControlName="{{ field.key }}"
-        />
-  
-        <p-inputNumber
-          *ngIf="field.type === 'number'"
-          id="{{ field.key }}"
-          formControlName="{{ field.key }}"
-          [mode]="'decimal'"
-        ></p-inputNumber>
-  
-        <p-dropdown
-          *ngIf="field.type === 'dropdown'"
-          id="{{ field.key }}"
-          [options]="field.options"
-          formControlName="{{ field.key }}"
-          [placeholder]="'Seleccionar...'"
-        ></p-dropdown>
-  
-        <!-- Validaciones -->
-        <div *ngIf="submitted && form.get(field.key)?.invalid" class="error-message">
-          {{ field.label }} es obligatorio.
+        <div *ngFor="let field of dialogFields" class="field">
+            <label [for]="field.key">{{ field.label }}</label>
+
+            <input
+                *ngIf="field.type === 'text'"
+                id="{{ field.key }}"
+                type="text"
+                pInputText
+                formControlName="{{ field.key }}"
+            />
+
+            <p-inputNumber
+                *ngIf="field.type === 'number'"
+                id="{{ field.key }}"
+                formControlName="{{ field.key }}"
+                [mode]="'decimal'"
+            ></p-inputNumber>
+
+            <p-dropdown
+                *ngIf="field.type === 'dropdown'"
+                id="{{ field.key }}"
+                [options]="field.options"
+                formControlName="{{ field.key }}"
+                [placeholder]="'Seleccionar...'"
+            ></p-dropdown>
+
+            <!-- Validaciones -->
+            <div
+                *ngIf="submitted && form.get(field.key)?.invalid"
+                class="error-message"
+            >
+                {{ field.label }} es obligatorio.
+            </div>
         </div>
-      </div>
     </form>
-  
+
     <p-footer>
-      <button
-        pButton
-        type="button"
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="hideDialog()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        label="Guardar"
-        icon="pi pi-check"
-        class="p-button-text"
-        (click)="saveItem()"
-        [disabled]="form.invalid"
-      ></button>
+        <button
+            pButton
+            type="button"
+            label="Cancelar"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="hideDialog()"
+        ></button>
+        <button
+            pButton
+            type="button"
+            label="Guardar"
+            icon="pi pi-check"
+            class="p-button-text"
+            (click)="saveItem()"
+            [disabled]="form.invalid"
+        ></button>
     </p-footer>
-  </p-dialog>
-  
-  <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+</p-dialog>
+
+<p-confirmDialog
+    header="Confirmación"
+    icon="pi pi-exclamation-triangle"
+></p-confirmDialog>

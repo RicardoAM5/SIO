@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ProductoService } from 'src/app/core/services/producto.service';
 import { IProducto } from 'src/app/core/models/IProducto.interface';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { AnchoService } from 'src/app/core/services/ancho.service';
 
 @Component({
   selector: 'app-admin-producto',
@@ -21,26 +22,28 @@ export class AdminProductoComponent implements OnInit {
     { field: 'gramajeReal.gramaje', header: 'Gramaje Real' },
     { field: 'categoria.categoria', header: 'Categoría' },
     { field: 'division.division', header: 'División' },
+    { field: 'inventario.cantidad', header: 'Inventario' },
     { field: 'estatus', header: 'Estatus' },
+
   ];
   globalFilterFields = [
     'productoMaestro.tipo.tipo',
     'productoMaestro.clase.clase',
     'productoMaestro.calibre.calibre',
     'productoMaestro.gramaje.gramaje',
-    
     'productoMaestro.molino.molino',
     'anchoReal.ancho',
     'calibreReal.calibre',
     'gramajeReal.gramaje',
     'categoria.categoria',
     'division.division',
+    'inventario.cantidad',
   ];
   tableTitle = 'Gestión de Productos';
   dialogFields = [
     { key: 'productoMaestro.idProductoMaestro', label: 'Producto Maestro', type: 'dropdown', required: true, options: [] },
-    { key: 'anchoReal.idAncho', label: 'Ancho Real', type: 'dropdown', required: true, options: [] },
-    { key: 'calibreReal.idCalibreReal', label: 'Calibre Real', type: 'dropdown', required: true, options: [] },
+    { key: 'anchoReal.idAncho', label: 'Ancho Real', type: 'dropdown', required: true, options: [this.anchoService.getAll] },
+    { key: 'calibreReal.idCalibreReal', label: 'Calibre (Real)', type: 'dropdown', required: true, options: [] },
     { key: 'gramajeReal.idGramajeReal', label: 'Gramaje Real', type: 'dropdown', required: true, options: [] },
     { key: 'categoria.idCategoria', label: 'Categoría', type: 'dropdown', required: true, options: [] },
     { key: 'division.idDivision', label: 'División', type: 'dropdown', required: true, options: [] },
@@ -53,6 +56,7 @@ export class AdminProductoComponent implements OnInit {
 
   constructor(
     private productoService: ProductoService,
+    private anchoService: AnchoService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
@@ -61,10 +65,18 @@ export class AdminProductoComponent implements OnInit {
     this.getAllProductos();
   }
 
+
+
   getAllProductos(): void {
     this.productoService.getAll().subscribe({
-      next: (data) => (this.productos = data),
-      error: () => this.showMessage('error', 'Error', 'Error al cargar los productos'),
+      next: (data) => {
+        this.productos = data;
+        this.messageService.clear(); // Clear all messages
+      },
+      error: () => {
+        this.messageService.clear(); // Clear all messages
+        this.showMessage('error', 'Error', 'Error al cargar los productos');
+      },
     });
   }
 

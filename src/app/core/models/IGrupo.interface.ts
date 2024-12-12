@@ -5,7 +5,8 @@ export interface IGrupo {
     nombre: string;
     descripcion: string;
     identificador: string;
+    valorIdentificador: string;
     estado: boolean;
     fechaCreacion: Date;    
-    agrupaciones: IAgrupacion[];
+    agrupaciones?: IAgrupacion[];
 }

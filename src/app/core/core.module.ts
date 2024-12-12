@@ -12,6 +12,7 @@ import { MolinoService } from './services/molino.service';
 import { TipoService } from './services/tipo.service';
 import { ProductoMaestroService } from './services/producto-maestro.service';
 import { ProductoService } from './services/producto.service';
+import { EstadisticaService } from './services/estadistica.service';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { ProductoService } from './services/producto.service';
     MolinoService,
     TipoService,
     ProductoMaestroService,
-    ProductoService
+    ProductoService,
+    EstadisticaService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

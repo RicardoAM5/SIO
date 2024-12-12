@@ -44,6 +44,9 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }> impleme
   }
 
   ngOnInit(): void {
+
+    
+
     this.setupForm();
   }
 
