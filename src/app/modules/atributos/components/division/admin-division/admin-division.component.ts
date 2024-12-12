@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DivisionService } from 'src/app/core/services/division.service';
 import { IDivision } from 'src/app/core/models/IDivision.interface';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-division',
@@ -11,190 +11,92 @@ import { MessageService } from 'primeng/api';
 })
 export class AdminDivisionComponent implements OnInit {
   public divisiones: IDivision[] = [];
-  public selectedDivisiones: IDivision[] = [];
-  public divisionDialog: boolean = false;
-  public division: IDivision = {
-    idDivision: 0,
-    division: '',
-    descripcion: '',
-    estatus: true,
-  };
-  public submitted: boolean = false;
+  public cols = [
+    { field: 'division', header: 'División' },
+    { field: 'descripcion', header: 'Descripción' },
+    { field: 'estatus', header: 'Estado' },
+  ];
+  public globalFilterFields = ['division', 'descripcion', 'estatus'];
+  public tableTitle = 'Gestión de Divisiones';
+  public dialogFields = [
+    { key: 'division', label: 'División', type: 'text', required: true },
+    { key: 'descripcion', label: 'Descripción', type: 'text', required: true },
+    { key: 'estatus', label: 'Estado', type: 'dropdown', options: [
+      { label: 'Activo', value: true },
+      { label: 'Inactivo', value: false },
+    ] },
+  ];
+  public modulo = 'Divisiones';
 
   constructor(
     private divisionService: DivisionService,
-    public messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAllDivisiones();
   }
 
-  // Obtener todas las divisiones
-  getAllDivisiones() {
+  getAllDivisiones(): void {
     this.divisionService.getAll().subscribe({
-      next: (data) => {
-        this.divisiones = data;
+      next: (data) => (this.divisiones = data),
+      error: () => this.showMessage('error', 'Error', 'Error al cargar las divisiones'),
+    });
+  }
+
+  saveDivision(division: IDivision): void {
+    const saveOperation = division.idDivision
+      ? this.divisionService.update(division.idDivision, division)
+      : this.divisionService.save(division);
+
+    saveOperation.subscribe({
+      next: (savedDivision) => {
+        if (division.idDivision) {
+          const index = this.divisiones.findIndex((d) => d.idDivision === savedDivision.idDivision);
+          if (index !== -1) this.divisiones[index] = savedDivision;
+          this.showMessage('success', 'Actualizado', 'División actualizada exitosamente');
+        } else {
+          this.divisiones.push(savedDivision);
+          this.showMessage('success', 'Creado', 'División creada exitosamente');
+        }
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al cargar las divisiones',
+      error: () => this.showMessage('error', 'Error', 'Error al guardar la división'),
+    });
+  }
+
+  deleteDivision(division: IDivision): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de que desea eliminar la división "${division.division}"?`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.divisionService.delete(division.idDivision).subscribe({
+          next: () => {
+            this.divisiones = this.divisiones.filter((d) => d.idDivision !== division.idDivision);
+            this.showMessage('success', 'Eliminado', 'División eliminada con éxito');
+          },
+          error: () => this.showMessage('error', 'Error', 'Error al eliminar la división'),
         });
-        console.error(err);
       },
     });
   }
 
-  // Abrir diálogo para crear una nueva división
-  openNew() {
-    this.division = {
-      idDivision: 0,
-      division: '',
-      descripcion: '',
-      estatus: true,
-    };
-    this.submitted = false;
-    this.divisionDialog = true;
-  }
-
-  // Guardar una división (nueva o editada)
-  saveDivision() {
-    this.submitted = true;
-
-    if (this.division.division.trim() && this.division.descripcion.trim()) {
-      if (this.division.idDivision === 0) {
-        // Crear nueva división
-        this.divisionService.save(this.division).subscribe({
-          next: (data) => {
-            this.divisiones.push(data);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'División creada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear la división',
-            });
-            console.error(err);
-          },
-        });
-      } else {
-        // Editar división existente
-        this.divisionService.update(this.division.idDivision, this.division).subscribe({
-          next: (data) => {
-            const index = this.divisiones.findIndex((d) => d.idDivision === data.idDivision);
-            if (index !== -1) {
-              this.divisiones[index] = data;
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'División actualizada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar la división',
-            });
-            console.error(err);
-          },
-        });
-      }
-
-      this.divisiones = [...this.divisiones]; // Refrescar la tabla
-      this.divisionDialog = false;
-      this.division = {
-        idDivision: 0,
-        division: '',
-        descripcion: '',
-        estatus: true,
-      };
-    }
-  }
-
-  // Editar una división
-  editDivision(division: IDivision) {
-    this.division = { ...division };
-    this.divisionDialog = true;
-  }
-
-  // Activar una división
-  activeDivision(division: IDivision) {
-    this.divisionService.active(division.idDivision).subscribe({
+  toggleEstado(division: IDivision): void {
+    division.estatus = !division.estatus;
+    this.divisionService.update(division.idDivision, division).subscribe({
       next: () => {
-        division.estatus = true;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'División activada',
-        });
+        this.showMessage(
+          'success',
+          'Éxito',
+          `El estado de la división fue ${division.estatus ? 'activado' : 'desactivado'} exitosamente`
+        );
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo activar la división',
-        });
-        console.error(err);
-      },
+      error: () => this.showMessage('error', 'Error', 'No se pudo actualizar el estado de la división'),
     });
   }
 
-  // Desactivar una división
-  disableDivision(division: IDivision) {
-    this.divisionService.disable(division.idDivision).subscribe({
-      next: () => {
-        division.estatus = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'División desactivada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo desactivar la división',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Eliminar una división seleccionada
-  deleteDivision(division: IDivision) {
-    this.divisionService.delete(division.idDivision).subscribe({
-      next: () => {
-        this.divisiones = this.divisiones.filter((d) => d.idDivision !== division.idDivision);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'División eliminada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo eliminar la división',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Cerrar diálogo
-  hideDialog() {
-    this.divisionDialog = false;
-    this.submitted = false;
+  private showMessage(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

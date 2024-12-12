@@ -28,6 +28,7 @@ export class AdminProductoComponent implements OnInit {
     'productoMaestro.clase.clase',
     'productoMaestro.calibre.calibre',
     'productoMaestro.gramaje.gramaje',
+    
     'productoMaestro.molino.molino',
     'anchoReal.ancho',
     'calibreReal.calibre',

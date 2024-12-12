@@ -1,57 +1,11 @@
-<div>
-  <h1>Grados</h1>
-</div>
-<hr>
-
-<div class="card">
-  <p-toolbar styleClass="mb-4 gap-2">
-    <ng-template pTemplate="left">
-      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
-      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedGrados.length" (onClick)="deleteGrado(selectedGrados[0])"></p-button>
-    </ng-template>
-  </p-toolbar>
-
-  <p-table [value]="grados" [(selection)]="selectedGrados" [rows]="10" [paginator]="true" dataKey="idGrado">
-    <ng-template pTemplate="header">
-      <tr>
-        <th pSelectableColumn></th>
-        <th pSortableColumn="grado">Grado</th>
-        <th pSortableColumn="descripcion">Descripción</th>
-        <th pSortableColumn="estado">Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-grado>
-      <tr>
-        <td><p-tableCheckbox [value]="grado"></p-tableCheckbox></td>
-        <td>{{ grado.grado }}</td>
-        <td>{{ grado.descripcion }}</td>
-        <td>{{ grado.estado ? 'Activo' : 'Inactivo' }}</td>
-        <td>
-          <p-button icon="pi pi-pencil" (onClick)="editGrado(grado)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableGrado(grado)" severity="danger" *ngIf="grado.estado"></p-button>
-          <p-button icon="pi pi-check" (onClick)="activeGrado(grado)" severity="success" *ngIf="!grado.estado"></p-button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
-  <p-dialog [(visible)]="gradoDialog" header="Detalles del Grado" [modal]="true">
-    <div class="p-fluid">
-      <div class="field">
-        <label for="grado">Grado</label>
-        <input id="grado" type="text" pInputText [(ngModel)]="grado.grado" required />
-      </div>
-      <div class="field">
-        <label for="descripcion">Descripción</label>
-        <input id="descripcion" type="text" pInputText [(ngModel)]="grado.descripcion" required />
-      </div>
-    </div>
-
-    <p-footer>
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveGrado()"></button>
-    </p-footer>
-  </p-dialog>
-</div>
-<p-toast></p-toast>
+<app-crud
+  [data]="grados"
+  [cols]="cols"
+  [globalFilterFields]="globalFilterFields"
+  [tableTitle]="tableTitle"
+  [dialogFields]="dialogFields"
+  [modulo]="modulo"
+  (save)="saveGrado($event)"
+  (delete)="deleteGrado($event)"
+  (toggleEstatus)="toggleEstado($event)"
+></app-crud>

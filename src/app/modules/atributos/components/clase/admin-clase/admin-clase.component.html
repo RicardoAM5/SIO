@@ -1,58 +1,11 @@
-<div>
-  <h1>Clases</h1>
-</div>
-<hr>
-
-<div class="card">
-  <p-toolbar styleClass="mb-4 gap-2">
-    <ng-template pTemplate="left">
-      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
-      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedClases.length" (onClick)="deleteClase(selectedClases[0])"></p-button>
-    </ng-template>
-  </p-toolbar>
-
-  <p-table [value]="clases" [(selection)]="selectedClases" [rows]="10" [paginator]="true" dataKey="idCase">
-    <ng-template pTemplate="header">
-      <tr>
-        <th pSelectableColumn></th>
-        <th pSortableColumn="clase">Clase</th>
-        <th pSortableColumn="descripcion">Descripción</th>
-        <th pSortableColumn="estatus">Estatus</th>
-        <th>Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-clase>
-      <tr>
-        <td><p-tableCheckbox [value]="clase"></p-tableCheckbox></td>
-        <td>{{ clase.clase }}</td>
-        <td>{{ clase.descripcion }}</td>
-        <td>{{ clase.estatus ? 'Activo' : 'Inactivo' }}</td>
-        <td>
-          <p-button icon="pi pi-pencil" (onClick)="editClase(clase)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableClase(clase)" severity="danger" *ngIf="clase.estatus"></p-button>
-          <p-button icon="pi pi-check" (onClick)="activeClase(clase)" severity="success" *ngIf="!clase.estatus"></p-button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
-  <p-dialog [(visible)]="claseDialog" header="Detalles de la Clase" [modal]="true">
-    <div class="p-fluid">
-      <div class="field">
-        <label for="clase">Clase</label>
-        <input id="clase" type="text" pInputText [(ngModel)]="clase.clase" required />
-      </div>
-      <div class="field">
-        <label for="descripcion">Descripción</label>
-        <input id="descripcion" type="text" pInputText [(ngModel)]="clase.descripcion" required />
-      </div>
-    </div>
-
-    <p-footer>
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveClase()"></button>
-    </p-footer>
-  </p-dialog>
-</div>
-
-<p-toast></p-toast>
+<app-crud
+  [data]="clases"
+  [cols]="cols"
+  [globalFilterFields]="globalFilterFields"
+  [tableTitle]="tableTitle"
+  [dialogFields]="dialogFields"
+  [modulo]="modulo"
+  (save)="saveClase($event)"
+  (delete)="deleteClase($event)"
+  (toggleEstatus)="toggleEstado($event)"
+></app-crud>

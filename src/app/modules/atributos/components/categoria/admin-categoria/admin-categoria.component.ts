@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CategoriaService } from 'src/app/core/services/categoria.service';
 import { ICategoria } from 'src/app/core/models/ICategoria.interface';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-categoria',
@@ -11,190 +11,92 @@ import { MessageService } from 'primeng/api';
 })
 export class AdminCategoriaComponent implements OnInit {
   public categorias: ICategoria[] = [];
-  public selectedCategorias: ICategoria[] = [];
-  public categoriaDialog: boolean = false;
-  public categoria: ICategoria = {
-    idCategoria: 0,
-    categoria: '',
-    descripcion: '',
-    estatus: true,
-  };
-  public submitted: boolean = false;
+  public cols = [
+    { field: 'categoria', header: 'Categoría' },
+    { field: 'descripcion', header: 'Descripción' },
+    { field: 'estatus', header: 'Estado' },
+  ];
+  public globalFilterFields = ['categoria', 'descripcion', 'estatus'];
+  public tableTitle = 'Gestión de Categorías';
+  public dialogFields = [
+    { key: 'categoria', label: 'Categoría', type: 'text', required: true },
+    { key: 'descripcion', label: 'Descripción', type: 'text', required: true },
+    { key: 'estatus', label: 'Estado', type: 'dropdown', options: [
+      { label: 'Activo', value: true },
+      { label: 'Inactivo', value: false },
+    ] },
+  ];
+  public modulo = 'Categorías';
 
   constructor(
     private categoriaService: CategoriaService,
-    public messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAllCategorias();
   }
 
-  // Obtener todas las categorías
-  getAllCategorias() {
+  getAllCategorias(): void {
     this.categoriaService.getAll().subscribe({
-      next: (data) => {
-        this.categorias = data;
+      next: (data) => (this.categorias = data),
+      error: () => this.showMessage('error', 'Error', 'Error al cargar las categorías'),
+    });
+  }
+
+  saveCategoria(categoria: ICategoria): void {
+    const saveOperation = categoria.idCategoria
+      ? this.categoriaService.update(categoria.idCategoria, categoria)
+      : this.categoriaService.save(categoria);
+
+    saveOperation.subscribe({
+      next: (savedCategoria) => {
+        if (categoria.idCategoria) {
+          const index = this.categorias.findIndex((c) => c.idCategoria === savedCategoria.idCategoria);
+          if (index !== -1) this.categorias[index] = savedCategoria;
+          this.showMessage('success', 'Actualizado', 'Categoría actualizada exitosamente');
+        } else {
+          this.categorias.push(savedCategoria);
+          this.showMessage('success', 'Creado', 'Categoría creada exitosamente');
+        }
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al cargar las categorías',
+      error: () => this.showMessage('error', 'Error', 'Error al guardar la categoría'),
+    });
+  }
+
+  deleteCategoria(categoria: ICategoria): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de que desea eliminar la categoría "${categoria.categoria}"?`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.categoriaService.delete(categoria.idCategoria).subscribe({
+          next: () => {
+            this.categorias = this.categorias.filter((c) => c.idCategoria !== categoria.idCategoria);
+            this.showMessage('success', 'Eliminado', 'Categoría eliminada con éxito');
+          },
+          error: () => this.showMessage('error', 'Error', 'Error al eliminar la categoría'),
         });
-        console.error(err);
       },
     });
   }
 
-  // Abrir diálogo para crear una nueva categoría
-  openNew() {
-    this.categoria = {
-      idCategoria: 0,
-      categoria: '',
-      descripcion: '',
-      estatus: true,
-    };
-    this.submitted = false;
-    this.categoriaDialog = true;
-  }
-
-  // Guardar una categoría (nueva o editada)
-  saveCategoria() {
-    this.submitted = true;
-
-    if (this.categoria.categoria.trim() && this.categoria.descripcion.trim()) {
-      if (this.categoria.idCategoria === 0) {
-        // Crear nueva categoría
-        this.categoriaService.save(this.categoria).subscribe({
-          next: (data) => {
-            this.categorias.push(data);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Categoría creada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear la categoría',
-            });
-            console.error(err);
-          },
-        });
-      } else {
-        // Editar categoría existente
-        this.categoriaService.update(this.categoria.idCategoria, this.categoria).subscribe({
-          next: (data) => {
-            const index = this.categorias.findIndex((c) => c.idCategoria === data.idCategoria);
-            if (index !== -1) {
-              this.categorias[index] = data;
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Categoría actualizada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar la categoría',
-            });
-            console.error(err);
-          },
-        });
-      }
-
-      this.categorias = [...this.categorias]; // Refrescar la tabla
-      this.categoriaDialog = false;
-      this.categoria = {
-        idCategoria: 0,
-        categoria: '',
-        descripcion: '',
-        estatus: true,
-      };
-    }
-  }
-
-  // Editar una categoría
-  editCategoria(categoria: ICategoria) {
-    this.categoria = { ...categoria };
-    this.categoriaDialog = true;
-  }
-
-  // Activar una categoría
-  activeCategoria(categoria: ICategoria) {
-    this.categoriaService.active(categoria.idCategoria).subscribe({
+  toggleEstado(categoria: ICategoria): void {
+    categoria.estatus = !categoria.estatus;
+    this.categoriaService.update(categoria.idCategoria, categoria).subscribe({
       next: () => {
-        categoria.estatus = true;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Categoría activada',
-        });
+        this.showMessage(
+          'success',
+          'Éxito',
+          `El estado de la categoría fue ${categoria.estatus ? 'activado' : 'desactivado'} exitosamente`
+        );
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo activar la categoría',
-        });
-        console.error(err);
-      },
+      error: () => this.showMessage('error', 'Error', 'No se pudo actualizar el estado de la categoría'),
     });
   }
 
-  // Desactivar una categoría
-  disableCategoria(categoria: ICategoria) {
-    this.categoriaService.disable(categoria.idCategoria).subscribe({
-      next: () => {
-        categoria.estatus = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Categoría desactivada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo desactivar la categoría',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Eliminar una categoría seleccionada
-  deleteCategoria(categoria: ICategoria) {
-    this.categoriaService.delete(categoria.idCategoria).subscribe({
-      next: () => {
-        this.categorias = this.categorias.filter((c) => c.idCategoria !== categoria.idCategoria);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Categoría eliminada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo eliminar la categoría',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Cerrar diálogo
-  hideDialog() {
-    this.categoriaDialog = false;
-    this.submitted = false;
+  private showMessage(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

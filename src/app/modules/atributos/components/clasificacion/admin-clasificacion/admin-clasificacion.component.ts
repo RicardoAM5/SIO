@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ClasificacionService } from 'src/app/core/services/clasificacion.service';
 import { IClasificacion } from 'src/app/core/models/IClasificacion.interface';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-clasificacion',
@@ -11,190 +11,94 @@ import { MessageService } from 'primeng/api';
 })
 export class AdminClasificacionComponent implements OnInit {
   public clasificaciones: IClasificacion[] = [];
-  public selectedClasificaciones: IClasificacion[] = [];
-  public clasificacionDialog: boolean = false;
-  public clasificacion: IClasificacion = {
-    idClasificacion: 0,
-    clasificacion: '',
-    descripcion: '',
-    estatus: true,
-  };
-  public submitted: boolean = false;
+  public cols = [
+    { field: 'clasificacion', header: 'Clasificación' },
+    { field: 'descripcion', header: 'Descripción' },
+    { field: 'estatus', header: 'Estado' },
+  ];
+  public globalFilterFields = ['clasificacion', 'descripcion', 'estatus'];
+  public tableTitle = 'Gestión de Clasificaciones';
+  public dialogFields = [
+    { key: 'clasificacion', label: 'Clasificación', type: 'text', required: true },
+    { key: 'descripcion', label: 'Descripción', type: 'text', required: true },
+    { key: 'estatus', label: 'Estado', type: 'dropdown', options: [
+      { label: 'Activo', value: true },
+      { label: 'Inactivo', value: false },
+    ] },
+  ];
+  public modulo = 'Clasificaciones';
 
   constructor(
     private clasificacionService: ClasificacionService,
-    public messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAllClasificaciones();
   }
 
-  // Obtener todas las clasificaciones
-  getAllClasificaciones() {
+  getAllClasificaciones(): void {
     this.clasificacionService.getAll().subscribe({
-      next: (data) => {
-        this.clasificaciones = data;
+      next: (data) => (this.clasificaciones = data),
+      error: () => this.showMessage('error', 'Error', 'Error al cargar las clasificaciones'),
+    });
+  }
+
+  saveClasificacion(clasificacion: IClasificacion): void {
+    const saveOperation = clasificacion.idClasificacion
+      ? this.clasificacionService.update(clasificacion.idClasificacion, clasificacion)
+      : this.clasificacionService.save(clasificacion);
+
+    saveOperation.subscribe({
+      next: (savedClasificacion) => {
+        if (clasificacion.idClasificacion) {
+          const index = this.clasificaciones.findIndex((c) => c.idClasificacion === savedClasificacion.idClasificacion);
+          if (index !== -1) this.clasificaciones[index] = savedClasificacion;
+          this.showMessage('success', 'Actualizado', 'Clasificación actualizada exitosamente');
+        } else {
+          this.clasificaciones.push(savedClasificacion);
+          this.showMessage('success', 'Creado', 'Clasificación creada exitosamente');
+        }
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al cargar las clasificaciones',
+      error: () => this.showMessage('error', 'Error', 'Error al guardar la clasificación'),
+    });
+  }
+
+  deleteClasificacion(clasificacion: IClasificacion): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de que desea eliminar la clasificación "${clasificacion.clasificacion}"?`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.clasificacionService.delete(clasificacion.idClasificacion).subscribe({
+          next: () => {
+            this.clasificaciones = this.clasificaciones.filter(
+              (c) => c.idClasificacion !== clasificacion.idClasificacion
+            );
+            this.showMessage('success', 'Eliminado', 'Clasificación eliminada con éxito');
+          },
+          error: () => this.showMessage('error', 'Error', 'Error al eliminar la clasificación'),
         });
-        console.error(err);
       },
     });
   }
 
-  // Abrir diálogo para crear una nueva clasificación
-  openNew() {
-    this.clasificacion = {
-      idClasificacion: 0,
-      clasificacion: '',
-      descripcion: '',
-      estatus: true,
-    };
-    this.submitted = false;
-    this.clasificacionDialog = true;
-  }
-
-  // Guardar una clasificación (nueva o editada)
-  saveClasificacion() {
-    this.submitted = true;
-
-    if (this.clasificacion.clasificacion.trim() && this.clasificacion.descripcion.trim()) {
-      if (this.clasificacion.idClasificacion === 0) {
-        // Crear nueva clasificación
-        this.clasificacionService.save(this.clasificacion).subscribe({
-          next: (data) => {
-            this.clasificaciones.push(data);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Clasificación creada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear la clasificación',
-            });
-            console.error(err);
-          },
-        });
-      } else {
-        // Editar clasificación existente
-        this.clasificacionService.update(this.clasificacion.idClasificacion, this.clasificacion).subscribe({
-          next: (data) => {
-            const index = this.clasificaciones.findIndex((c) => c.idClasificacion === data.idClasificacion);
-            if (index !== -1) {
-              this.clasificaciones[index] = data;
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Clasificación actualizada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar la clasificación',
-            });
-            console.error(err);
-          },
-        });
-      }
-
-      this.clasificaciones = [...this.clasificaciones]; // Refrescar la tabla
-      this.clasificacionDialog = false;
-      this.clasificacion = {
-        idClasificacion: 0,
-        clasificacion: '',
-        descripcion: '',
-        estatus: true,
-      };
-    }
-  }
-
-  // Editar una clasificación
-  editClasificacion(clasificacion: IClasificacion) {
-    this.clasificacion = { ...clasificacion };
-    this.clasificacionDialog = true;
-  }
-
-  // Activar una clasificación
-  activeClasificacion(clasificacion: IClasificacion) {
-    this.clasificacionService.active(clasificacion.idClasificacion).subscribe({
+  toggleEstado(clasificacion: IClasificacion): void {
+    clasificacion.estatus = !clasificacion.estatus;
+    this.clasificacionService.update(clasificacion.idClasificacion, clasificacion).subscribe({
       next: () => {
-        clasificacion.estatus = true;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Clasificación activada',
-        });
+        this.showMessage(
+          'success',
+          'Éxito',
+          `El estado de la clasificación fue ${clasificacion.estatus ? 'activado' : 'desactivado'} exitosamente`
+        );
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo activar la clasificación',
-        });
-        console.error(err);
-      },
+      error: () => this.showMessage('error', 'Error', 'No se pudo actualizar el estado de la clasificación'),
     });
   }
 
-  // Desactivar una clasificación
-  disableClasificacion(clasificacion: IClasificacion) {
-    this.clasificacionService.disable(clasificacion.idClasificacion).subscribe({
-      next: () => {
-        clasificacion.estatus = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Clasificación desactivada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo desactivar la clasificación',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Eliminar una clasificación seleccionada
-  deleteClasificacion(clasificacion: IClasificacion) {
-    this.clasificacionService.delete(clasificacion.idClasificacion).subscribe({
-      next: () => {
-        this.clasificaciones = this.clasificaciones.filter((c) => c.idClasificacion !== clasificacion.idClasificacion);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Clasificación eliminada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo eliminar la clasificación',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Cerrar diálogo
-  hideDialog() {
-    this.clasificacionDialog = false;
-    this.submitted = false;
+  private showMessage(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

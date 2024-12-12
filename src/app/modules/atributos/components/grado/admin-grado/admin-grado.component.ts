@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GradoService } from 'src/app/core/services/grado.service';
 import { IGrado } from 'src/app/core/models/IGrado.interface';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-grado',
@@ -11,190 +11,92 @@ import { MessageService } from 'primeng/api';
 })
 export class AdminGradoComponent implements OnInit {
   public grados: IGrado[] = [];
-  public selectedGrados: IGrado[] = [];
-  public gradoDialog: boolean = false;
-  public grado: IGrado = {
-    idGrado: 0,
-    grado: '',
-    descripcion: '',
-    estado: true,
-  };
-  public submitted: boolean = false;
+  public cols = [
+    { field: 'grado', header: 'Grado' },
+    { field: 'descripcion', header: 'Descripción' },
+    { field: 'estatus', header: 'Estatus' },
+  ];
+  public globalFilterFields = ['grado', 'descripcion', 'estado'];
+  public tableTitle = 'Gestión de Grados';
+  public dialogFields = [
+    { key: 'grado', label: 'Grado', type: 'text', required: true },
+    { key: 'descripcion', label: 'Descripción', type: 'text', required: true },
+    { key: 'estatus', label: 'Estatus', type: 'dropdown', options: [
+      { label: 'Activo', value: true },
+      { label: 'Inactivo', value: false },
+    ] },
+  ];
+  public modulo = 'Grados';
 
   constructor(
     private gradoService: GradoService,
-    public messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAllGrados();
   }
 
-  // Obtener todos los grados
-  getAllGrados() {
+  getAllGrados(): void {
     this.gradoService.getAll().subscribe({
-      next: (data) => {
-        this.grados = data;
+      next: (data) => (this.grados = data),
+      error: () => this.showMessage('error', 'Error', 'Error al cargar los grados'),
+    });
+  }
+
+  saveGrado(grado: IGrado): void {
+    const saveOperation = grado.idGrado
+      ? this.gradoService.update(grado.idGrado, grado)
+      : this.gradoService.save(grado);
+
+    saveOperation.subscribe({
+      next: (savedGrado) => {
+        if (grado.idGrado) {
+          const index = this.grados.findIndex((g) => g.idGrado === savedGrado.idGrado);
+          if (index !== -1) this.grados[index] = savedGrado;
+          this.showMessage('success', 'Actualizado', 'Grado actualizado exitosamente');
+        } else {
+          this.grados.push(savedGrado);
+          this.showMessage('success', 'Creado', 'Grado creado exitosamente');
+        }
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al cargar los grados',
+      error: () => this.showMessage('error', 'Error', 'Error al guardar el grado'),
+    });
+  }
+
+  deleteGrado(grado: IGrado): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de que desea eliminar el grado "${grado.grado}"?`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.gradoService.delete(grado.idGrado).subscribe({
+          next: () => {
+            this.grados = this.grados.filter((g) => g.idGrado !== grado.idGrado);
+            this.showMessage('success', 'Eliminado', 'Grado eliminado con éxito');
+          },
+          error: () => this.showMessage('error', 'Error', 'Error al eliminar el grado'),
         });
-        console.error(err);
       },
     });
   }
 
-  // Abrir diálogo para crear un nuevo grado
-  openNew() {
-    this.grado = {
-      idGrado: 0,
-      grado: '',
-      descripcion: '',
-      estado: true,
-    };
-    this.submitted = false;
-    this.gradoDialog = true;
-  }
-
-  // Guardar un grado (nuevo o editado)
-  saveGrado() {
-    this.submitted = true;
-
-    if (this.grado.grado.trim() && this.grado.descripcion.trim()) {
-      if (this.grado.idGrado === 0) {
-        // Crear nuevo grado
-        this.gradoService.save(this.grado).subscribe({
-          next: (data) => {
-            this.grados.push(data);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Grado creado',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear el grado',
-            });
-            console.error(err);
-          },
-        });
-      } else {
-        // Editar grado existente
-        this.gradoService.update(this.grado.idGrado, this.grado).subscribe({
-          next: (data) => {
-            const index = this.grados.findIndex((g) => g.idGrado === data.idGrado);
-            if (index !== -1) {
-              this.grados[index] = data;
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Grado actualizado',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar el grado',
-            });
-            console.error(err);
-          },
-        });
-      }
-
-      this.grados = [...this.grados]; // Refrescar la tabla
-      this.gradoDialog = false;
-      this.grado = {
-        idGrado: 0,
-        grado: '',
-        descripcion: '',
-        estado: true,
-      };
-    }
-  }
-
-  // Editar un grado
-  editGrado(grado: IGrado) {
-    this.grado = { ...grado };
-    this.gradoDialog = true;
-  }
-
-  // Activar un grado
-  activeGrado(grado: IGrado) {
-    this.gradoService.active(grado.idGrado).subscribe({
+  toggleEstado(grado: IGrado): void {
+    grado.estatus = !grado.estatus;
+    this.gradoService.update(grado.idGrado, grado).subscribe({
       next: () => {
-        grado.estado = true;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Grado activado',
-        });
+        this.showMessage(
+          'success',
+          'Éxito',
+          `El estado del grado fue ${grado.estatus ? 'activado' : 'desactivado'} exitosamente`
+        );
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo activar el grado',
-        });
-        console.error(err);
-      },
+      error: () => this.showMessage('error', 'Error', 'No se pudo actualizar el estado del grado'),
     });
   }
 
-  // Desactivar un grado
-  disableGrado(grado: IGrado) {
-    this.gradoService.disable(grado.idGrado).subscribe({
-      next: () => {
-        grado.estado = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Grado desactivado',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo desactivar el grado',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Eliminar un grado seleccionado
-  deleteGrado(grado: IGrado) {
-    this.gradoService.delete(grado.idGrado).subscribe({
-      next: () => {
-        this.grados = this.grados.filter((g) => g.idGrado !== grado.idGrado);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Grado eliminado',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo eliminar el grado',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Cerrar diálogo
-  hideDialog() {
-    this.gradoDialog = false;
-    this.submitted = false;
+  private showMessage(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

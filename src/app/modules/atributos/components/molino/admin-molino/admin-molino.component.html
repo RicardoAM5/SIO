@@ -1,63 +1,11 @@
-<div>
-  <h1>Molinos</h1>
-</div>
-<hr>
-
-<div class="card">
-  <p-toolbar styleClass="mb-4 gap-2">
-    <ng-template pTemplate="left">
-      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
-      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedMolinos.length" (onClick)="deleteMolino(selectedMolinos[0])"></p-button>
-    </ng-template>
-  </p-toolbar>
-
-  <p-table [value]="molinos" [(selection)]="selectedMolinos" [rows]="10" [paginator]="true" dataKey="idMolino">
-    <ng-template pTemplate="header">
-      <tr>
-        <th pSelectableColumn></th>
-        <th pSortableColumn="molino">Molino</th>
-        <th pSortableColumn="eta">ETA</th>
-        <th pSortableColumn="descripcion">Descripción</th>
-        <th pSortableColumn="estatus">Estatus</th>
-        <th>Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-molino>
-      <tr>
-        <td><p-tableCheckbox [value]="molino"></p-tableCheckbox></td>
-        <td>{{ molino.molino }}</td>
-        <td>{{ molino.eta }}</td>
-        <td>{{ molino.descripcion }}</td>
-        <td>{{ molino.estatus ? 'Activo' : 'Inactivo' }}</td>
-        <td>
-          <p-button icon="pi pi-pencil" (onClick)="editMolino(molino)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableMolino(molino)" severity="danger" *ngIf="molino.estatus" ></p-button>
-          <p-button icon="pi pi-check" (onClick)="activeMolino(molino)" severity="success" *ngIf="!molino.estatus"></p-button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
-  <p-dialog [(visible)]="molinoDialog" header="Detalles del Molino" [modal]="true">
-    <div class="p-fluid">
-      <div class="field">
-        <label for="molino">Molino</label>
-        <input id="molino" type="text" pInputText [(ngModel)]="molino.molino" required />
-      </div>
-      <div class="field">
-        <label for="eta">ETA</label>
-        <input id="eta" type="number" pInputText [(ngModel)]="molino.eta" required />
-      </div>
-      <div class="field">
-        <label for="descripcion">Descripción</label>
-        <input id="descripcion" type="text" pInputText [(ngModel)]="molino.descripcion" required />
-      </div>
-    </div>
-
-    <p-footer>
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveMolino()"></button>
-    </p-footer>
-  </p-dialog>
-</div>
-<p-toast></p-toast>
+<app-crud
+  [data]="molinos"
+  [cols]="cols"
+  [globalFilterFields]="globalFilterFields"
+  [tableTitle]="tableTitle"
+  [dialogFields]="dialogFields"
+  [modulo]="modulo"
+  (save)="saveMolino($event)"
+  (delete)="deleteMolino($event)"
+  (toggleEstatus)="toggleEstado($event)"
+></app-crud>

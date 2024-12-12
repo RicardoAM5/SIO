@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ClaseService } from 'src/app/core/services/clase.service';
 import { IClase } from 'src/app/core/models/IClase.interface';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-clase',
@@ -11,190 +11,92 @@ import { MessageService } from 'primeng/api';
 })
 export class AdminClaseComponent implements OnInit {
   public clases: IClase[] = [];
-  public selectedClases: IClase[] = [];
-  public claseDialog: boolean = false;
-  public clase: IClase = {
-    idClase: 0,
-    clase: '',
-    descripcion: '',
-    estatus: true,
-  };
-  public submitted: boolean = false;
+  public cols = [
+    { field: 'clase', header: 'Clase' },
+    { field: 'descripcion', header: 'Descripción' },
+    { field: 'estatus', header: 'Estado' },
+  ];
+  public globalFilterFields = ['clase', 'descripcion', 'estatus'];
+  public tableTitle = 'Gestión de Clases';
+  public dialogFields = [
+    { key: 'clase', label: 'Clase', type: 'text', required: true },
+    { key: 'descripcion', label: 'Descripción', type: 'text', required: true },
+    { key: 'estatus', label: 'Estado', type: 'dropdown', options: [
+      { label: 'Activo', value: true },
+      { label: 'Inactivo', value: false },
+    ] },
+  ];
+  public modulo = 'Clases';
 
   constructor(
     private claseService: ClaseService,
-    public messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAllClases();
   }
 
-  // Obtener todas las clases
-  getAllClases() {
+  getAllClases(): void {
     this.claseService.getAll().subscribe({
-      next: (data) => {
-        this.clases = data;
+      next: (data) => (this.clases = data),
+      error: () => this.showMessage('error', 'Error', 'Error al cargar las clases'),
+    });
+  }
+
+  saveClase(clase: IClase): void {
+    const saveOperation = clase.idClase
+      ? this.claseService.update(clase.idClase, clase)
+      : this.claseService.save(clase);
+
+    saveOperation.subscribe({
+      next: (savedClase) => {
+        if (clase.idClase) {
+          const index = this.clases.findIndex((c) => c.idClase === savedClase.idClase);
+          if (index !== -1) this.clases[index] = savedClase;
+          this.showMessage('success', 'Actualizado', 'Clase actualizada exitosamente');
+        } else {
+          this.clases.push(savedClase);
+          this.showMessage('success', 'Creado', 'Clase creada exitosamente');
+        }
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al cargar las clases',
+      error: () => this.showMessage('error', 'Error', 'Error al guardar la clase'),
+    });
+  }
+
+  deleteClase(clase: IClase): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de que desea eliminar la clase "${clase.clase}"?`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.claseService.delete(clase.idClase).subscribe({
+          next: () => {
+            this.clases = this.clases.filter((c) => c.idClase !== clase.idClase);
+            this.showMessage('success', 'Eliminado', 'Clase eliminada con éxito');
+          },
+          error: () => this.showMessage('error', 'Error', 'Error al eliminar la clase'),
         });
-        console.error(err);
       },
     });
   }
 
-  // Abrir diálogo para crear una nueva clase
-  openNew() {
-    this.clase = {
-      idClase: 0,
-      clase: '',
-      descripcion: '',
-      estatus: true,
-    };
-    this.submitted = false;
-    this.claseDialog = true;
-  }
-
-  // Guardar una clase (nueva o editada)
-  saveClase() {
-    this.submitted = true;
-
-    if (this.clase.clase.trim() && this.clase.descripcion.trim()) {
-      if (this.clase.idClase === 0) {
-        // Crear nueva clase
-        this.claseService.save(this.clase).subscribe({
-          next: (data) => {
-            this.clases.push(data);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Clase creada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear la clase',
-            });
-            console.error(err);
-          },
-        });
-      } else {
-        // Editar clase existente
-        this.claseService.update(this.clase.idClase, this.clase).subscribe({
-          next: (data) => {
-            const index = this.clases.findIndex((c) => c.idClase === data.idClase);
-            if (index !== -1) {
-              this.clases[index] = data;
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Clase actualizada',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar la clase',
-            });
-            console.error(err);
-          },
-        });
-      }
-
-      this.clases = [...this.clases]; // Refrescar la tabla
-      this.claseDialog = false;
-      this.clase = {
-        idClase: 0,
-        clase: '',
-        descripcion: '',
-        estatus: true,
-      };
-    }
-  }
-
-  // Editar una clase
-  editClase(clase: IClase) {
-    this.clase = { ...clase };
-    this.claseDialog = true;
-  }
-
-  // Activar una clase
-  activeClase(clase: IClase) {
-    this.claseService.active(clase.idClase).subscribe({
+  toggleEstado(clase: IClase): void {
+    clase.estatus = !clase.estatus;
+    this.claseService.update(clase.idClase, clase).subscribe({
       next: () => {
-        clase.estatus = true;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Clase activada',
-        });
+        this.showMessage(
+          'success',
+          'Éxito',
+          `El estado de la clase fue ${clase.estatus ? 'activado' : 'desactivado'} exitosamente`
+        );
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo activar la clase',
-        });
-        console.error(err);
-      },
+      error: () => this.showMessage('error', 'Error', 'No se pudo actualizar el estado de la clase'),
     });
   }
 
-  // Desactivar una clase
-  disableClase(clase: IClase) {
-    this.claseService.disable(clase.idClase).subscribe({
-      next: () => {
-        clase.estatus = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Clase desactivada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo desactivar la clase',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Eliminar una clase seleccionada
-  deleteClase(clase: IClase) {
-    this.claseService.delete(clase.idClase).subscribe({
-      next: () => {
-        this.clases = this.clases.filter((c) => c.idClase !== clase.idClase);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Clase eliminada',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo eliminar la clase',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Cerrar diálogo
-  hideDialog() {
-    this.claseDialog = false;
-    this.submitted = false;
+  private showMessage(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

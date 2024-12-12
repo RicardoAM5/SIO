@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CalibreService } from 'src/app/core/services/calibre.service';
 import { ICalibre } from 'src/app/core/models/ICalibre.interface';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-admin-calibre',
@@ -11,190 +11,92 @@ import { MessageService } from 'primeng/api';
 })
 export class AdminCalibreComponent implements OnInit {
   public calibres: ICalibre[] = [];
-  public selectedCalibres: ICalibre[] = [];
-  public calibreDialog: boolean = false;
-  public calibre: ICalibre = {
-    idCalibre: 0,
-    calibre: 0,
-    sufijo: '',
-    estado: true,
-  };
-  public submitted: boolean = false;
+  public cols = [
+    { field: 'calibre', header: 'Calibre' },
+    { field: 'sufijo', header: 'Sufijo' },
+    { field: 'estatus', header: 'Estatus' },
+  ];
+  public globalFilterFields = ['calibre', 'sufijo', 'estado'];
+  public tableTitle = 'Gestión de Calibres';
+  public dialogFields = [
+    { key: 'calibre', label: 'Calibre', type: 'number', required: true },
+    { key: 'sufijo', label: 'Sufijo', type: 'text', required: true },
+    { key: 'estatus', label: 'Estatus', type: 'dropdown', options: [
+      { label: 'Activo', value: true },
+      { label: 'Inactivo', value: false },
+    ] },
+  ];
+  public modulo = 'Calibres';
 
   constructor(
     private calibreService: CalibreService,
-    public messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAllCalibres();
   }
 
-  // Obtener todos los calibres
-  getAllCalibres() {
+  getAllCalibres(): void {
     this.calibreService.getAll().subscribe({
-      next: (data) => {
-        this.calibres = data;
+      next: (data) => (this.calibres = data),
+      error: () => this.showMessage('error', 'Error', 'Error al cargar los calibres'),
+    });
+  }
+
+  saveCalibre(calibre: ICalibre): void {
+    const saveOperation = calibre.idCalibre
+      ? this.calibreService.update(calibre.idCalibre, calibre)
+      : this.calibreService.save(calibre);
+
+    saveOperation.subscribe({
+      next: (savedCalibre) => {
+        if (calibre.idCalibre) {
+          const index = this.calibres.findIndex((c) => c.idCalibre === savedCalibre.idCalibre);
+          if (index !== -1) this.calibres[index] = savedCalibre;
+          this.showMessage('success', 'Actualizado', 'Calibre actualizado exitosamente');
+        } else {
+          this.calibres.push(savedCalibre);
+          this.showMessage('success', 'Creado', 'Calibre creado exitosamente');
+        }
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al cargar los calibres',
+      error: () => this.showMessage('error', 'Error', 'Error al guardar el calibre'),
+    });
+  }
+
+  deleteCalibre(calibre: ICalibre): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de que desea eliminar el calibre "${calibre.calibre}"?`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.calibreService.delete(calibre.idCalibre).subscribe({
+          next: () => {
+            this.calibres = this.calibres.filter((c) => c.idCalibre !== calibre.idCalibre);
+            this.showMessage('success', 'Eliminado', 'Calibre eliminado con éxito');
+          },
+          error: () => this.showMessage('error', 'Error', 'Error al eliminar el calibre'),
         });
-        console.error(err);
       },
     });
   }
 
-  // Abrir diálogo para crear un nuevo calibre
-  openNew() {
-    this.calibre = {
-      idCalibre: 0,
-      calibre: 0,
-      sufijo: '',
-      estado: true,
-    };
-    this.submitted = false;
-    this.calibreDialog = true;
-  }
-
-  // Guardar un calibre (nuevo o editado)
-  saveCalibre() {
-    this.submitted = true;
-
-    if (this.calibre.calibre > 0 && this.calibre.sufijo.trim()) {
-      if (this.calibre.idCalibre === 0) {
-        // Crear nuevo calibre
-        this.calibreService.save(this.calibre).subscribe({
-          next: (data) => {
-            this.calibres.push(data);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Calibre creado',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo crear el calibre',
-            });
-            console.error(err);
-          },
-        });
-      } else {
-        // Editar calibre existente
-        this.calibreService.update(this.calibre.idCalibre, this.calibre).subscribe({
-          next: (data) => {
-            const index = this.calibres.findIndex((c) => c.idCalibre === data.idCalibre);
-            if (index !== -1) {
-              this.calibres[index] = data;
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Calibre actualizado',
-            });
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo actualizar el calibre',
-            });
-            console.error(err);
-          },
-        });
-      }
-
-      this.calibres = [...this.calibres]; // Refrescar la tabla
-      this.calibreDialog = false;
-      this.calibre = {
-        idCalibre: 0,
-        calibre: 0,
-        sufijo: '',
-        estado: true,
-      };
-    }
-  }
-
-  // Editar un calibre
-  editCalibre(calibre: ICalibre) {
-    this.calibre = { ...calibre };
-    this.calibreDialog = true;
-  }
-
-  // Activar un calibre
-  activeCalibre(calibre: ICalibre) {
-    this.calibreService.active(calibre.idCalibre).subscribe({
+  toggleEstado(calibre: ICalibre): void {
+    calibre.estado = !calibre.estado;
+    this.calibreService.update(calibre.idCalibre, calibre).subscribe({
       next: () => {
-        calibre.estado = true;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Calibre activado',
-        });
+        this.showMessage(
+          'success',
+          'Éxito',
+          `El estado del calibre fue ${calibre.estado ? 'activado' : 'desactivado'} exitosamente`
+        );
       },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo activar el calibre',
-        });
-        console.error(err);
-      },
+      error: () => this.showMessage('error', 'Error', 'No se pudo actualizar el estado del calibre'),
     });
   }
 
-  // Desactivar un calibre
-  disableCalibre(calibre: ICalibre) {
-    this.calibreService.disable(calibre.idCalibre).subscribe({
-      next: () => {
-        calibre.estado = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Calibre desactivado',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo desactivar el calibre',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Eliminar un calibre seleccionado
-  deleteCalibre(calibre: ICalibre) {
-    this.calibreService.delete(calibre.idCalibre).subscribe({
-      next: () => {
-        this.calibres = this.calibres.filter((c) => c.idCalibre !== calibre.idCalibre);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Calibre eliminado',
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo eliminar el calibre',
-        });
-        console.error(err);
-      },
-    });
-  }
-
-  // Cerrar diálogo
-  hideDialog() {
-    this.calibreDialog = false;
-    this.submitted = false;
+  private showMessage(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

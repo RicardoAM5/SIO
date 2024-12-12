@@ -1,57 +1,11 @@
-<div>
-  <h1>Calibres</h1>
-</div>
-<hr>
-
-<div class="card">
-  <p-toolbar styleClass="mb-4 gap-2">
-    <ng-template pTemplate="left">
-      <p-button severity="success" label="Nuevo" icon="pi pi-plus" (onClick)="openNew()"></p-button>
-      <p-button severity="danger" label="Eliminar" icon="pi pi-trash" [disabled]="!selectedCalibres.length" (onClick)="deleteCalibre(selectedCalibres[0])"></p-button>
-    </ng-template>
-  </p-toolbar>
-
-  <p-table [value]="calibres" [(selection)]="selectedCalibres" [rows]="10" [paginator]="true" dataKey="idCalibre">
-    <ng-template pTemplate="header">
-      <tr>
-        <th pSelectableColumn></th>
-        <th pSortableColumn="calibre">Calibre</th>
-        <th pSortableColumn="sufijo">Sufijo</th>
-        <th pSortableColumn="estado">Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-calibre>
-      <tr>
-        <td><p-tableCheckbox [value]="calibre"></p-tableCheckbox></td>
-        <td>{{ calibre.calibre }}</td>
-        <td>{{ calibre.sufijo }}</td>
-        <td>{{ calibre.estado ? 'Activo' : 'Inactivo' }}</td>
-        <td>
-          <p-button icon="pi pi-pencil" (onClick)="editCalibre(calibre)"></p-button>
-          <p-button icon="pi pi-trash" (onClick)="disableCalibre(calibre)" severity="danger" *ngIf="calibre.estado"></p-button>
-          <p-button icon="pi pi-check" (onClick)="activeCalibre(calibre)" severity="success" *ngIf="!calibre.estado"></p-button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
-  <p-dialog [(visible)]="calibreDialog" header="Detalles del Calibre" [modal]="true">
-    <div class="p-fluid">
-      <div class="field">
-        <label for="calibre">Calibre</label>
-        <input id="calibre" type="number" pInputText [(ngModel)]="calibre.calibre" required />
-      </div>
-      <div class="field">
-        <label for="sufijo">Sufijo</label>
-        <input id="sufijo" type="text" pInputText [(ngModel)]="calibre.sufijo" required />
-      </div>
-    </div>
-
-    <p-footer>
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-      <button pButton type="button" label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveCalibre()"></button>
-    </p-footer>
-  </p-dialog>
-</div>
-<p-toast></p-toast>
+<app-crud
+  [data]="calibres"
+  [cols]="cols"
+  [globalFilterFields]="globalFilterFields"
+  [tableTitle]="tableTitle"
+  [dialogFields]="dialogFields"
+  [modulo]="modulo"
+  (save)="saveCalibre($event)"
+  (delete)="deleteCalibre($event)"
+  (toggleEstatus)="toggleEstado($event)"
+></app-crud>
