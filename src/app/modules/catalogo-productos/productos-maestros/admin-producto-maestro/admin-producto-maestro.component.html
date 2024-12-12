@@ -1,3 +1,11 @@
-<p>
-  admin-producto-maestro works!
-</p>
+<app-crud
+  [data]="productosMaestros"
+  [cols]="cols"
+  [globalFilterFields]="globalFilterFields"
+  [tableTitle]="tableTitle"
+  [dialogFields]="dialogFields"
+  [modulo]="modulo"
+  (save)="saveProductoMaestro($event)"
+  (delete)="deleteProductoMaestro($event)"
+  (toggleEstatus)="toggleEstatus($event)"
+></app-crud>

@@ -2,6 +2,7 @@ import { IAncho } from "./IAncho.interface";
 import { ICalibre } from "./ICalibre.interface";
 import { IClase } from "./IClase.interface";
 import { IClasificacion } from "./IClasificacion.interface";
+import { IDivision } from "./IDivision.interface";
 import { IGrado } from "./IGrado.interface";
 import { IGramaje } from "./IGramaje.interface";
 import { IMolino } from "./IMolino.interface";

@@ -71,7 +71,7 @@ export class AdminAnchoComponent implements OnInit {
 
     this.confirmationService.confirm({
 
-      message: `¿Está seguro de que desea eliminar físicamente el ancho "${ancho.ancho}"? Esta acción no se puede deshacer.`,
+      message: `¿Está seguro de que desea eliminar físicamente el ancho "${ancho.ancho}"?<br> Esta acción no se puede deshacer.<br> Esta accion no se realizara si exite una transaccion relacionada con este ancho.`,
       header: 'Confirmación de Eliminación',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
@@ -89,7 +89,6 @@ export class AdminAnchoComponent implements OnInit {
   }
   
 
-  
 
   private showMessage(severity: string, summary: string, detail: string): void {
     this.messageService.add({ severity, summary, detail });

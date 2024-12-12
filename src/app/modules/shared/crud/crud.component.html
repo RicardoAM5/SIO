@@ -40,7 +40,6 @@
           [dataKey]="'id'"
           [responsiveLayout]="'scroll'"
           [columns]="cols"
-          responsiveLayout="scroll"
           [rowHover]="true"
         >
           <ng-template pTemplate="caption">
@@ -73,7 +72,12 @@
               <td></td>
               <td *ngFor="let col of cols">
                 <ng-container *ngIf="!isNestedField(item, col.field)">
-                  {{ item[col.field] }}
+                  <ng-container *ngIf="col.field === 'estatus'">
+                    {{ item[col.field] ? 'Activo' : 'Inactivo' }}
+                  </ng-container>
+                  <ng-container *ngIf="col.field !== 'estatus'">
+                    {{ item[col.field] }}
+                  </ng-container>
                 </ng-container>
                 <ng-container *ngIf="isNestedField(item, col.field)">
                   {{ getNestedFieldValue(item, col.field) }}
@@ -92,7 +96,7 @@
                     pButton
                     pRipple
                     [icon]="item.estatus ? 'pi pi-trash' : 'pi pi-undo'"
-                    [class.p-button-danger]="item.estatus"
+                    [class.p-button-secondary]="item.estatus"
                     [class.p-button-success]="!item.estatus"
                     class="p-button-rounded"
                     (click)="toggleItemEstatus(item)"
@@ -101,7 +105,7 @@
                     pButton
                     pRipple
                     icon="pi pi-times"
-                    class="p-button-rounded p-button-danger"
+                    class="p-button-rounded p-button-danger ml-2"
                     (click)="deleteItem(item)"
                   ></button>
                 </div>
@@ -146,7 +150,8 @@
           formControlName="{{ field.key }}"
           [placeholder]="'Seleccionar...'"
         ></p-dropdown>
-         <!-- Validaciones -->
+  
+        <!-- Validaciones -->
         <div *ngIf="submitted && form.get(field.key)?.invalid" class="error-message">
           {{ field.label }} es obligatorio.
         </div>
@@ -173,5 +178,5 @@
       ></button>
     </p-footer>
   </p-dialog>
-
+  
   <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>

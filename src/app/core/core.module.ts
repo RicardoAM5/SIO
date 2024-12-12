@@ -10,6 +10,8 @@ import { GradoService } from './services/grado.service';
 import { GramajeService } from './services/gramaje.service';
 import { MolinoService } from './services/molino.service';
 import { TipoService } from './services/tipo.service';
+import { ProductoMaestroService } from './services/producto-maestro.service';
+import { ProductoService } from './services/producto.service';
 
 
 @NgModule({
@@ -26,7 +28,9 @@ import { TipoService } from './services/tipo.service';
     GradoService,
     GramajeService,
     MolinoService,
-    TipoService
+    TipoService,
+    ProductoMaestroService,
+    ProductoService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

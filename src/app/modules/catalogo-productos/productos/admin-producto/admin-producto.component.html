@@ -1,3 +1,11 @@
-<p>
-  admin-producto works!
-</p>
+<app-crud
+  [data]="productos"
+  [cols]="cols"
+  [globalFilterFields]="globalFilterFields"
+  [tableTitle]="tableTitle"
+  [dialogFields]="dialogFields"
+  [modulo]="modulo"
+  (save)="saveProducto($event)"
+  (delete)="deleteProducto($event)"
+  (toggleEstatus)="toggleEstatus($event)"
+></app-crud>

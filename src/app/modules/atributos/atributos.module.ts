@@ -40,8 +40,6 @@ import { CrudComponent } from '../shared/crud/crud.component';
     ReactiveFormsModule,
     CoreModule,
     PrimeNgModule,
-    AtributosRoutingModule,
-    AtributosRoutingModule,
     CrudComponent
   ],
   exports: [

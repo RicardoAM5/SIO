@@ -3,20 +3,31 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Table } from 'primeng/table';
 import { PrimeNgModule } from '../prime-ng.module';
 
+interface Column {
+  field: string;
+  header: string;
+}
+
+interface DialogField {
+  key: string;
+  label: string;
+  type: string;
+  required?: boolean;
+  options?: { label: string; value: any }[];
+}
+
 @Component({
   selector: 'app-crud',
   templateUrl: './crud.component.html',
   standalone: true,
   imports: [PrimeNgModule],
 })
-export class CrudComponent<T extends { id?: number; estatus?: boolean }>
-  implements OnInit
-{
+export class CrudComponent<T extends { id?: number; estatus?: boolean }> implements OnInit {
   @Input() data: T[] = [];
-  @Input() cols: { field: string; header: string }[] = [];
+  @Input() cols: Column[] = [];
   @Input() globalFilterFields: string[] = [];
   @Input() tableTitle: string = '';
-  @Input() dialogFields: any[] = [];
+  @Input() dialogFields: DialogField[] = [];
   @Input() modulo: string = '';
 
   @Output() save = new EventEmitter<T>();
@@ -28,9 +39,7 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }>
   submitted: boolean = false;
   currentItem: T | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-  ) {
+  constructor(private fb: FormBuilder) {
     this.form = this.fb.group({});
   }
 
@@ -42,7 +51,7 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }>
     const controls = this.dialogFields.reduce((acc, field) => {
       acc[field.key] = ['', field.required ? Validators.required : null];
       return acc;
-    }, {});
+    }, {} as { [key: string]: any });
     this.form = this.fb.group(controls);
   }
 
@@ -50,8 +59,6 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }>
     const value = (event.target as HTMLInputElement).value.trim();
     table.filterGlobal(value, 'contains');
   }
-
-
 
   openDialog(isEdit: boolean, item?: T): void {
     this.itemDialog = true;
