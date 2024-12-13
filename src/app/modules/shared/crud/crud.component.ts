@@ -39,6 +39,7 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }> impleme
   submitted: boolean = false;
   currentItem: T | null = null;
 
+
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({});
   }
@@ -106,5 +107,9 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }> impleme
 
   getNestedFieldValue(item: any, field: string): any {
     return field.split('.').reduce((acc, key) => acc?.[key], item);
+  }
+
+  clear(dt: Table): void {
+    dt.clear();
   }
 }
