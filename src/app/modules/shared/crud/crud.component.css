@@ -1,0 +1,15 @@
+.text-success {
+    color: green;
+  }
+  
+  .text-danger {
+    color: red;
+  }
+
+  .text-warning {
+    color: orange;
+  }
+
+  .text-delete {
+    color: rgb(95, 6, 6);
+  }

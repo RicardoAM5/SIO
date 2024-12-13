@@ -19,6 +19,7 @@ interface DialogField {
 @Component({
   selector: 'app-crud',
   templateUrl: './crud.component.html',
+  styleUrls: [ './crud.component.css' ],
   standalone: true,
   imports: [PrimeNgModule],
 })
