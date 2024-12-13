@@ -19,7 +19,7 @@ interface DialogField {
 @Component({
   selector: 'app-crud',
   templateUrl: './crud.component.html',
-  styleUrls: [ './crud.component.css' ],
+  styleUrls: ['./crud.component.css'],
   standalone: true,
   imports: [PrimeNgModule],
 })
@@ -39,17 +39,15 @@ export class CrudComponent<T extends { id?: number; estatus?: boolean }> impleme
   form: FormGroup;
   submitted: boolean = false;
   currentItem: T | null = null;
-
+  selectedColumns: Column[] = [];
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({});
   }
 
   ngOnInit(): void {
-
-    
-
     this.setupForm();
+    this.selectedColumns = this.cols; // Initially select all columns
   }
 
   setupForm(): void {
